@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجز سر الإكليل المقدس - الكنيسة</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f4f6f9 0%, #e4e9f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2c3e50;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 45px 35px;
+            border-radius: 22px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            width: 100%;
+            max-width: 460px;
+            border-top: 5px solid #c5a059;
+        }
+
+        .cross-symbol {
+            font-size: 34px;
+            color: #c5a059;
+            margin-bottom: 15px;
+            background: #fdfcf7;
+            width: 65px;
+            height: 65px;
+            line-height: 65px;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.15);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        p.subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #dcdde1;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: #fafbfc;
+        }
+
+        input:focus, select:focus {
+            border-color: #c5a059;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #2c3e50;
+            color: white;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.15);
+        }
+
+        button:hover {
+            background-color: #1a252f;
+            transform: translateY(-1px);
+        }
+
+        .partner-info {
+            background: #fdfcf7;
+            border: 1px dashed #c5a059;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #8a6d3b;
+            display: none;
+            text-align: right;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: #95a5a6;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="cross-symbol">✝</div>
+        <h2>حجز سر الإكليل المقدس</h2>
+        <p class="subtitle">بالمحبة نلتقي، لربط ملف العريس والعروسة في حزمة بيانات موحدة لدى الكنيسة</p>
+
+        <form id="userForm">
+            <div class="input-group">
+                <label for="fullName">الاسم بالكامل</label>
+                <input type="text" id="fullName" required placeholder="أدخل اسمك الكريم">
+            </div>
+
+            <div class="input-group">
+                <label for="role">تحديد الصفة</label>
+                <select id="role" required>
+                    <option value="" disabled selected>-- اختر صفتك في الإكليل --</option>
+                    <option value="عريس">عريس</option>
+                    <option value="عروسة">عروسة</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="idOption">حالة ملف الحزمة (ID)</label>
+                <select id="idOption" required>
+                    <option value="" disabled selected>-- اختر حالة الـ ID --</option>
+                    <option value="إنشاء ID جديد">إنشاء باقة جديدة وتوليد كود خاص بي</option>
+                    <option value="لدي ID من قبل">الانضمام للباقة برمز الطرف الآخر</option>
+                </select>
+            </div>
+
+            <div class="input-group" id="idInputGroup" style="display: none;">
+                <label for="partnerId">أدخل الـ ID الخاص بالطرف الآخر للربط</label>
+                <input type="text" id="partnerId" placeholder="مثلاً: 123456">
+                <div class="partner-info" id="partnerInfoBox"></div>
+            </div>
+
+            <div class="input-group" id="newIdGroup">
+                <label for="myCustomId">أنشئ الكود التعريفي (ID) للباقة</label>
+                <input type="text" id="myCustomId" required placeholder="اكتب كود فريد ومميز للباقة">
+            </div>
+
+            <div class="input-group">
+                <label for="phone">رقم التليفون</label>
+                <input type="tel" id="phone" required placeholder="01xxxxxxxxx">
+            </div>
+
+            <button type="submit" id="submitBtn">موافق (OK) وحفظ الحزمة</button>
+        </form>
+
+        <a href="../index.html" class="back-link">العودة إلى الصفحة الرئيسية</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
+          authDomain: "wedding-34f49.firebaseapp.com",
+          projectId: "wedding-34f49",
+          storageBucket: "wedding-34f49.firebasestorage.app",
+          messagingSenderId: "1071878294617",
+          appId: "1:1071878294617:web:5e7138d17a3aa78366f548",
+          measurementId: "G-69VMQJT1Z8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // إظهار أو إخفاء الحقول حسب الاختيار
+        document.getElementById('idOption').addEventListener('change', function() {
+            const idInputGroup = document.getElementById('idInputGroup');
+            const newIdGroup = document.getElementById('newIdGroup');
+            
+            if (this.value === 'لدي ID من قبل') {
+                idInputGroup.style.display = 'block';
+                newIdGroup.style.display = 'none';
+                document.getElementById('partnerId').setAttribute('required', 'true');
+                document.getElementById('myCustomId').removeAttribute('required');
+            } else {
+                idInputGroup.style.display = 'none';
+                newIdGroup.style.display = 'block';
+                document.getElementById('partnerId').removeAttribute('required');
+                document.getElementById('myCustomId').setAttribute('required', 'true');
+                document.getElementById('partnerInfoBox').style.display = 'none';
+            }
+        });
+
+        // البحث التلقائي وإظهار بيانات الطرف الآخر بمجرد الانتهاء من كتابة الـ ID والضغط خارجه
+        document.getElementById('partnerId').addEventListener('blur', async function() {
+            const packageId = this.value.trim();
+            const infoBox = document.getElementById('partnerInfoBox');
+
+            if (!packageId) return;
+
+            try {
+                const docRef = doc(db, "WeddingPackages", packageId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    let infoText = "";
+
+                    // التحقق مما إذا كان المسجل المسبق هو عريس أو عروسة لعرضه تلقائياً
+                    if (data.groom && data.groom.phone && data.groom.phone !== "") {
+                        infoText = `الطرف المسجل مسبقاً (العريس): <strong>${data.groom.fullName}</strong>`;
+                    } else if (data.bride && data.bride.phone && data.bride.phone !== "") {
+                        infoText = `الطرف المسجل مسبقاً (العروسة): <strong>${data.bride.fullName}</strong>`;
+                    } else {
+                        infoText = "هذه الباقة فارغة حالياً.";
+                    }
+
+                    infoBox.style.display = 'block';
+                    infoBox.innerHTML = infoText;
+                } else {
+                    infoBox.style.display = 'block';
+                    infoBox.innerHTML = "❌ هذا الـ ID غير موجود بالنظام، تأكد من الرقم.";
+                }
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+            }
+        });
+
+        const form = document.getElementById('userForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const role = document.getElementById('role').value;
+            const idOption = document.getElementById('idOption').value;
+            const phone = document.getElementById('phone').value.trim();
+
+            try {
+                if (idOption === 'إنشاء ID جديد') {
+                    const packageId = document.getElementById('myCustomId').value.trim();
+                    const docRef = doc(db, "WeddingPackages", packageId);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        alert("هذا الـ ID مستخدم مسبقاً، يرجى اختيار رمز أو رقم آخر.");
+                        return;
+                    }
+
+                    const packageData = {
+                        packageId: packageId,
+                        status: "قيد المراجعة",
+                        createdAt: new Date()
+                    };
+
+                    if (role === 'عريس') {
+                        packageData.groom = { fullName, phone };
+                        packageData.bride = { fullName: "", phone: "" };
+                    } else {
+                        packageData.bride = { fullName, phone };
+                        packageData.groom = { fullName: "", phone: "" };
+                    }
+
+                    await setDoc(docRef, packageData);
+
+                    localStorage.setItem('userName', fullName);
+                    localStorage.setItem('userRole', role);
+                    localStorage.setItem('userId', packageId);
+                    localStorage.setItem('userPhone', phone);
+
+                    alert(`تم إنشاء الباقة بنجاح!\nالـ ID المشترك للباقة هو: ${packageId}`);
+                    window.location.href = 'home.html';
+
+                } else {
+                    const packageId = document.getElementById('partnerId').value.trim();
+                    const docRef = doc(db, "WeddingPackages", packageId);
+                    const docSnap = await getDoc(docRef);
+
+                    if (!docSnap.exists()) {
+                        alert("خطأ: الـ ID غير موجود بالنظام، تأكد من الرقم الصحيح.");
+                        return;
+                    }
+
+                    const pkgData = docSnap.data();
+
+                    if (role === 'عريس' && pkgData.groom && pkgData.groom.phone !== "") {
+                        alert("هذه الباقة مسجل فيها عريس بالفعل!");
+                        return;
+                    }
+                    if (role === 'عروسة' && pkgData.bride && pkgData.bride.phone !== "") {
+                        alert("هذه الباقة مسجل فيها عروسة بالفعل!");
+                        return;
+                    }
+
+                    const updateData = {};
+                    if (role === 'عريس') {
+                        updateData.groom = { fullName, phone };
+                    } else {
+                        updateData.bride = { fullName, phone };
+                    }
+
+                    await updateDoc(docRef, updateData);
+
+                    localStorage.setItem('userName', fullName);
+                    localStorage.setItem('userRole', role);
+                    localStorage.setItem('userId', packageId);
+                    localStorage.setItem('userPhone', phone);
+
+                    alert("تم ربط الحسابين بنجاح داخل حزمة الإكليل الموحدة!");
+                    window.location.href = 'home.html';
+                }
+
+            } catch (error) {
+                console.error("خطأ في الاتصال بقاعدة البيانات: ", error);
+                alert("حدث خطأ أثناء الحفظ، تأكد من اتصال الإنترنت وصلاحيات قاعدة البيانات.");
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - سر الإكليل</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f4f6f9 0%, #e4e9f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2c3e50;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 40px 30px;
+            border-radius: 22px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            border-top: 5px solid #c5a059;
+        }
+
+        .cross-symbol {
+            font-size: 34px;
+            color: #c5a059;
+            margin-bottom: 12px;
+            background: #fdfcf7;
+            width: 65px;
+            height: 65px;
+            line-height: 65px;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.15);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-control, select {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fafbfc;
+            color: #2c3e50;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus, select:focus {
+            border-color: #c5a059;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #c5a059;
+            color: white;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2);
+        }
+
+        .action-btn:hover {
+            background-color: #b08d48;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="cross-symbol">✝</div>
+        
+        <div id="firstPassSection">
+            <h2>تسجيل الدخول للنظام</h2>
+            <p style="color: #7f8c8d; font-size: 13px; margin-bottom: 20px;">الرجاء إدخال كلمة المرور الرئيسية للمتابعة</p>
+            
+            <div class="form-group">
+                <label>كلمة المرور الرئيسية:</label>
+                <input type="password" id="mainPasswordInput" class="form-control" placeholder="أدخل كلمة المرور...">
+            </div>
+            
+            <button class="action-btn" id="checkMainPassBtn">التالي</button>
+            <div id="mainErrorMsg" class="error-msg"></div>
+        </div>
+
+        <div id="priestLoginSection" class="hidden">
+            <h2>تسجيل دخول أب الكاهن</h2>
+            <p style="color: #7f8c8d; font-size: 13px; margin-bottom: 20px;">اختر اسم أب الكاهن وأدخل كلمة المرور الخاصة به</p>
+            
+            <div class="form-group">
+                <label>اختر أب الكاهن:</label>
+                <select id="priestSelectLogin" class="form-control">
+                    <option value="">-- اختر أب الكاهن --</option>
+                    <option value="أبونا إفرايم">أبونا إفرايم</option>
+                    <option value="أبونا إرميا">أبونا إرميا</option>
+                    <option value="أبونا أثناسيوس">أبونا أثناسيوس</option>
+                    <option value="أبونا صموئيل">أبونا صموئيل</option>
+                    <option value="أبونا نوفير">أبونا نوفير</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>كلمة المرور الخاصة بالكاهن:</label>
+                <input type="password" id="priestPasswordInput" class="form-control" placeholder="أدخل كلمة المرور الخاصة بك...">
+            </div>
+            
+            <button class="action-btn" id="loginPriestBtn">دخول إلى main.html</button>
+            <div id="priestErrorMsg" class="error-msg"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // كلمة المرور الرئيسية الأولى
+        const mainPassword = "TONY@CONTROL2026";
+
+        // كلمات المرور الخاصة بالآباء الكهنة
+        const priestCredentials = {
+            "أبونا إفرايم": "Efraim@789",
+            "أبونا إرميا": "Irmia@456",
+            "أبونا أثناسيوس": "Athanasius@321",
+            "أبونا صموئيل": "Samuel@654",
+            "أبونا نوفير": "Nofir@987"
+        };
+
+        const firstPassSection = document.getElementById('firstPassSection');
+        const priestLoginSection = document.getElementById('priestLoginSection');
+        
+        const mainPasswordInput = document.getElementById('mainPasswordInput');
+        const checkMainPassBtn = document.getElementById('checkMainPassBtn');
+        const mainErrorMsg = document.getElementById('mainErrorMsg');
+
+        const priestSelectLogin = document.getElementById('priestSelectLogin');
+        const priestPasswordInput = document.getElementById('priestPasswordInput');
+        const loginPriestBtn = document.getElementById('loginPriestBtn');
+        const priestErrorMsg = document.getElementById('priestErrorMsg');
+
+        // الخطوة 1: التحقق من كلمة المرور الرئيسية
+        checkMainPassBtn.addEventListener('click', () => {
+            const enteredMainPass = mainPasswordInput.value.trim();
+
+            if (enteredMainPass === mainPassword) {
+                firstPassSection.classList.add('hidden');
+                priestLoginSection.classList.remove('hidden');
+            } else {
+                mainErrorMsg.textContent = "كلمة المرور الرئيسية غير صحيحة.";
+            }
+        });
+
+        // الخطوة 2: التحقق من اختيار الكاهن وكلمة المرور الخاصة به وفتح main.html
+        loginPriestBtn.addEventListener('click', () => {
+            const selectedPriest = priestSelectLogin.value;
+            const enteredPriestPass = priestPasswordInput.value.trim();
+
+            if (!selectedPriest) {
+                priestErrorMsg.textContent = "الرجاء اختيار اسم أب الكاهن.";
+                return;
+            }
+
+            if (priestCredentials[selectedPriest] && priestCredentials[selectedPriest] === enteredPriestPass) {
+                // حفظ اسم الكاهن في الذاكرة المحلية لاستخدامه في الصفحة التالية إن لزم الأمر
+                localStorage.setItem('assignedPriest', selectedPriest);
+                
+                // الانتقال إلى صفحة main.html
+                window.location.href = "main.html";
+            } else {
+                priestErrorMsg.textContent = "كلمة المرور الخاصة بهذا الكاهن غير صحيحة.";
+            }
+        });
+    </script>
+</body>
+</html>

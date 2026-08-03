@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفحة الرئيسية - حجز سر الإكليل</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f4f6f9 0%, #e4e9f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2c3e50;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 40px 30px;
+            border-radius: 22px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            width: 100%;
+            max-width: 520px;
+            border-top: 5px solid #c5a059;
+        }
+
+        .cross-symbol {
+            font-size: 34px;
+            color: #c5a059;
+            margin-bottom: 12px;
+            background: #fdfcf7;
+            width: 65px;
+            height: 65px;
+            line-height: 65px;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.15);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .welcome-text {
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            font-size: 13px;
+        }
+
+        .card {
+            background: #fafbfc;
+            border: 1.5px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            color: #c5a059;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+
+        .card p {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .card p span {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-waiting {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-linked {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .no-data {
+            color: #e74c3c;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #2c3e50;
+            color: white;
+            margin-top: 10px;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.15);
+        }
+
+        .action-btn:hover {
+            background-color: #1a252f;
+            transform: translateY(-1px);
+        }
+
+        .btn-gold {
+            background-color: #c5a059 !important;
+        }
+
+        .btn-gold:hover {
+            background-color: #b08d48 !important;
+        }
+
+        .locked-notice {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-top: 10px;
+            text-align: center;
+            border: 1px solid #ffeeba;
+        }
+
+        .logout-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #95a5a6;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
+        }
+
+        .logout-link:hover {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="cross-symbol">✝</div>
+        <h2>لوحة متابعة سر الإكليل</h2>
+        <p class="welcome-text">متابعة تفاصيل الباقة وحالة المستندات والمواعيد</p>
+
+        <div class="card" id="dataCard">
+            <p>جاري تحميل بيانات الباقة من الكنيسة...</p>
+        </div>
+
+        <div id="actionsContainer">
+            <a href="documents.html" class="action-btn">رفع المستندات والأوراق المطلوبة</a>
+            <div id="calendarButtonWrapper"></div>
+        </div>
+
+        <a href="index.html" class="logout-link">تسجيل الخروج</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
+          authDomain: "wedding-34f49.firebaseapp.com",
+          projectId: "wedding-34f49",
+          storageBucket: "wedding-34f49.firebasestorage.app",
+          messagingSenderId: "1071878294617",
+          appId: "1:1071878294617:web:5e7138d17a3aa78366f548",
+          measurementId: "G-69VMQJT1Z8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const packageId = localStorage.getItem('userId');
+            const myRole = localStorage.getItem('userRole');
+            const dataCard = document.getElementById('dataCard');
+            const calendarButtonWrapper = document.getElementById('calendarButtonWrapper');
+
+            if (!packageId) {
+                dataCard.innerHTML = '<p class="no-data">لا توجد بيانات مسجلة حالياً، يرجى التسجيل أولاً.</p>';
+                calendarButtonWrapper.innerHTML = '';
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "WeddingPackages", packageId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const pkg = docSnap.data();
+                    
+                    const groomName = pkg.groom && pkg.groom.fullName ? pkg.groom.fullName : "غير مسجل";
+                    const groomPhone = pkg.groom && pkg.groom.phone ? pkg.groom.phone : "غير متوفر";
+                    
+                    const brideName = pkg.bride && pkg.bride.fullName ? pkg.bride.fullName : "غير مسجل";
+                    const bridePhone = pkg.bride && pkg.bride.phone ? pkg.bride.phone : "غير متوفر";
+
+                    let isLinked = false;
+                    let partnerTitle = "";
+                    let partnerName = "";
+                    let partnerPhone = "";
+
+                    if (myRole === 'عريس') {
+                        if (pkg.bride && pkg.bride.phone && pkg.bride.phone !== "") {
+                            isLinked = true;
+                            partnerTitle = "العروسة";
+                            partnerName = brideName;
+                            partnerPhone = bridePhone;
+                        }
+                    } else {
+                        if (pkg.groom && pkg.groom.phone && pkg.groom.phone !== "") {
+                            isLinked = true;
+                            partnerTitle = "العريس";
+                            partnerName = groomName;
+                            partnerPhone = groomPhone;
+                        }
+                    }
+
+                    let linkStatusHTML = "";
+                    if (isLinked) {
+                        linkStatusHTML = `
+                            <span class="status-badge status-linked">مترابط ومتصل بنجاح ✝</span>
+                            <p style="margin-top: 10px;">أنت مرتبط مع (${partnerTitle}): <span>${partnerName}</span></p>
+                            <p>رقم هاتف الشريك: <span>${partnerPhone}</span></p>
+                        `;
+                    } else {
+                        linkStatusHTML = `
+                            <span class="status-badge status-waiting">بانتظار ربط الطرف الآخر ⏳</span>
+                            <p style="margin-top: 10px; color: #e67e22;">لم يتم اكتمال ربط الطرف الآخر بعد. أعطه الـ ID الخاص بك ليتسجيل من خلاله.</p>
+                        `;
+                    }
+
+                    // حالات المستندات
+                    const docStatus = pkg.documentsStatus || "لم تقم بالرفع بعد"; // (لم تقم بالرفع بعد، قيد المراجعة، مقبولة، مرفوضة)
+                    let docStatusColor = "#7f8c8d";
+                    if (docStatus === "قيد المراجعة") docStatusColor = "#d35400";
+                    else if (docStatus === "مقبولة") docStatusColor = "#27ae60";
+                    else if (docStatus === "مرفوضة") docStatusColor = "#c0392b";
+
+                    dataCard.innerHTML = `
+                        <h3>معرف الحزمة (ID): ${packageId}</h3>
+                        <p>اسمك: <span>${localStorage.getItem('userName') || 'غير معروف'}</span></p>
+                        <p>الصفة: <span>${myRole}</span></p>
+                        <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 12px 0;">
+                        ${linkStatusHTML}
+                        <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 12px 0;">
+                        <p>حالة المستندات: <strong style="color: ${docStatusColor};">${docStatus}</strong></p>
+                    `;
+
+                    // إذا تم قبول الأوراق من قبل الكنيسة (مقبولة)، يظهر زر حجز الموعد الذهبي
+                    if (docStatus === "مقبولة") {
+                        calendarButtonWrapper.innerHTML = `
+                            <a href="calendar.html" class="action-btn btn-gold">حجز موعد المقابلة وأب الكاهن 🗓️</a>
+                        `;
+                    } else if (docStatus === "قيد المراجعة") {
+                        calendarButtonWrapper.innerHTML = `
+                            <div class="locked-notice">
+                                ⏳ تم رفع المستندات وهي <strong>قيد المراجعة</strong> من قبل الكنيسة.<br>سيتم فتح زر حجز الموعد فور قبول الأوراق.
+                            </div>
+                        `;
+                    } else {
+                        calendarButtonWrapper.innerHTML = `
+                            <div class="locked-notice">
+                                🔒 يرجى رفع المستندات والأوراق المطلوبة أولاً ومتابعة حالتها حتى يتم قبولها لفتح حجز الموعد.
+                            </div>
+                        `;
+                    }
+
+                } else {
+                    dataCard.innerHTML = '<p class="no-data">لم يتم العثور على بيانات هذه الباقة في قاعدة البيانات.</p>';
+                    calendarButtonWrapper.innerHTML = '';
+                }
+            } catch (error) {
+                console.error("خطأ في جلب بيانات الباقة:", error);
+                dataCard.innerHTML = '<p class="no-data">حدث خطأ أثناء تحميل البيانات، تأكد من الاتصال بالإنترنت.</p>';
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -172,7 +172,7 @@
     <div class="container">
         <div class="cross-symbol">✝</div>
         <h2>لوحة متابعة سر الإكليل</h2>
-        <p class="welcome-text">متابعة تفاصيل الباقة وحالة المستندات والمواعيد</p>
+        <p class="welcome-text">متابعة تفاصيل الباقة وحالة المستندات ومواعيد الفرح</p>
 
         <div class="card" id="dataCard">
             <p>جاري تحميل بيانات الباقة من الكنيسة...</p>
@@ -217,7 +217,7 @@
             }
 
             try {
-                const docRef = doc(db, "WeddingPackages", packageId);
+                const docRef = doc(db, "check", packageId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -229,7 +229,6 @@
                     const brideName = pkg.bride && pkg.bride.fullName ? pkg.bride.fullName : "غير مسجل";
                     const bridePhone = pkg.bride && pkg.bride.phone ? pkg.bride.phone : "غير متوفر";
 
-                    // التحقق من اكتمال بيانات الطرفين لتعريف حالة الارتباط
                     const isGroomRegistered = pkg.groom && pkg.groom.fullName && pkg.groom.fullName.trim() !== "";
                     const isBrideRegistered = pkg.bride && pkg.bride.fullName && pkg.bride.fullName.trim() !== "";
                     
@@ -266,7 +265,6 @@
                         `;
                     }
 
-                    // حالات المستندات
                     const docStatus = pkg.documentsStatus || "لم تقم بالرفع بعد"; 
                     let docStatusColor = "#7f8c8d";
                     if (docStatus === "قيد المراجعة") docStatusColor = "#d35400";
@@ -283,21 +281,21 @@
                         <p>حالة المستندات: <strong style="color: ${docStatusColor};">${docStatus}</strong></p>
                     `;
 
-                    // إذا تم قبول الأوراق من قبل الكنيسة (مقبولة)، يظهر زر حجز الموعد الذهبي
+                    // إذا قام الكنيسة/الأب بالقبول (مقبولة)، يتم إظهار زر الذهاب لصفحة موعد الفرح مباشرة
                     if (docStatus === "مقبولة") {
                         calendarButtonWrapper.innerHTML = `
-                            <a href="calendar.html" class="action-btn btn-gold">حجز موعد المقابلة وأب الكاهن 🗓️</a>
+                            <a href="wedding-date.html" class="action-btn btn-gold">الانتقال إلى صفحة موعد الفرح 🗓️</a>
                         `;
                     } else if (docStatus === "قيد المراجعة") {
                         calendarButtonWrapper.innerHTML = `
                             <div class="locked-notice">
-                                ⏳ تم رفع المستندات وهي <strong>قيد المراجعة</strong> من قبل الكنيسة.<br>سيتم فتح زر حجز الموعد فور قبول الأوراق.
+                                ⏳ تم رفع المستندات وهي <strong>قيد المراجعة</strong> من قبل الكنيسة.<br>سيتم فتح صفحة موعد الفرح فور قبول الأوراق.
                             </div>
                         `;
                     } else {
                         calendarButtonWrapper.innerHTML = `
                             <div class="locked-notice">
-                                🔒 يرجى رفع المستندات والأوراق المطلوبة أولاً ومتابعة حالتها حتى يتم قبولها لفتح حجز الموعد.
+                                🔒 يرجى رفع المستندات والأوراق المطلوبة أولاً ومتابعة حالتها حتى يتم قبولها لفتح صفحة موعد الفرح.
                             </div>
                         `;
                     }

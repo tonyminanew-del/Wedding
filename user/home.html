@@ -205,7 +205,8 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             const packageId = localStorage.getItem('userId');
-            const myRole = localStorage.getItem('userRole');
+            const myRole = localStorage.getItem('userRole'); // 'عريس' أو 'عروسة'
+            const myStoredName = localStorage.getItem('userName') || '';
             const dataCard = document.getElementById('dataCard');
             const calendarButtonWrapper = document.getElementById('calendarButtonWrapper');
 
@@ -228,43 +229,45 @@
                     const brideName = pkg.bride && pkg.bride.fullName ? pkg.bride.fullName : "غير مسجل";
                     const bridePhone = pkg.bride && pkg.bride.phone ? pkg.bride.phone : "غير متوفر";
 
-                    let isLinked = false;
+                    // التحقق من اكتمال بيانات الطرفين لتعريف حالة الارتباط
+                    const isGroomRegistered = pkg.groom && pkg.groom.fullName && pkg.groom.fullName.trim() !== "";
+                    const isBrideRegistered = pkg.bride && pkg.bride.fullName && pkg.bride.fullName.trim() !== "";
+                    
+                    let isLinked = isGroomRegistered && isBrideRegistered;
+                    
+                    let currentUserName = "";
                     let partnerTitle = "";
                     let partnerName = "";
                     let partnerPhone = "";
 
                     if (myRole === 'عريس') {
-                        if (pkg.bride && pkg.bride.phone && pkg.bride.phone !== "") {
-                            isLinked = true;
-                            partnerTitle = "العروسة";
-                            partnerName = brideName;
-                            partnerPhone = bridePhone;
-                        }
+                        currentUserName = groomName !== "غير مسجل" ? groomName : myStoredName;
+                        partnerTitle = "العروسة";
+                        partnerName = brideName;
+                        partnerPhone = bridePhone;
                     } else {
-                        if (pkg.groom && pkg.groom.phone && pkg.groom.phone !== "") {
-                            isLinked = true;
-                            partnerTitle = "العريس";
-                            partnerName = groomName;
-                            partnerPhone = groomPhone;
-                        }
+                        currentUserName = brideName !== "غير مسجل" ? brideName : myStoredName;
+                        partnerTitle = "العريس";
+                        partnerName = groomName;
+                        partnerPhone = groomPhone;
                     }
 
                     let linkStatusHTML = "";
                     if (isLinked) {
                         linkStatusHTML = `
                             <span class="status-badge status-linked">مترابط ومتصل بنجاح ✝</span>
-                            <p style="margin-top: 10px;">أنت مرتبط مع (${partnerTitle}): <span>${partnerName}</span></p>
+                            <p style="margin-top: 10px;">أنت <span>${currentUserName}</span> مرتبط مع (${partnerTitle}): <span>${partnerName}</span></p>
                             <p>رقم هاتف الشريك: <span>${partnerPhone}</span></p>
                         `;
                     } else {
                         linkStatusHTML = `
                             <span class="status-badge status-waiting">بانتظار ربط الطرف الآخر ⏳</span>
-                            <p style="margin-top: 10px; color: #e67e22;">لم يتم اكتمال ربط الطرف الآخر بعد. أعطه الـ ID الخاص بك ليتسجيل من خلاله.</p>
+                            <p style="margin-top: 10px; color: #e67e22;">أنت <span>${currentUserName}</span>، ولم يتم اكتمال تسجيل الطرف الآخر بعد في هذه الباقة.</p>
                         `;
                     }
 
                     // حالات المستندات
-                    const docStatus = pkg.documentsStatus || "لم تقم بالرفع بعد"; // (لم تقم بالرفع بعد، قيد المراجعة، مقبولة، مرفوضة)
+                    const docStatus = pkg.documentsStatus || "لم تقم بالرفع بعد"; 
                     let docStatusColor = "#7f8c8d";
                     if (docStatus === "قيد المراجعة") docStatusColor = "#d35400";
                     else if (docStatus === "مقبولة") docStatusColor = "#27ae60";
@@ -272,7 +275,7 @@
 
                     dataCard.innerHTML = `
                         <h3>معرف الحزمة (ID): ${packageId}</h3>
-                        <p>اسمك: <span>${localStorage.getItem('userName') || 'غير معروف'}</span></p>
+                        <p>اسمك: <span>${currentUserName}</span></p>
                         <p>الصفة: <span>${myRole}</span></p>
                         <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 12px 0;">
                         ${linkStatusHTML}

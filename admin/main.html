@@ -81,7 +81,6 @@
             transform: translateY(-2px);
         }
 
-        /* نقطة الإشعارات الحمراء الصغيرة */
         .badge-dot {
             position: absolute;
             top: 8px;
@@ -148,7 +147,7 @@
             line-height: 1.6;
         }
 
-        /* قسم الباقات والحجوزات */
+        /* قسم الطلبات والمعاينة */
         .section-box {
             background: #ffffff;
             padding: 25px;
@@ -171,15 +170,50 @@
         .package-item {
             background: #fafbfc;
             border: 1.5px solid #e9ecef;
-            padding: 15px 20px;
+            padding: 20px;
             border-radius: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             transition: all 0.3s;
         }
 
         .package-item:hover {
             border-color: #c5a059;
-            transform: translateY(-1px);
+        }
+
+        .action-btns-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-accept {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-accept:hover {
+            background-color: #219653;
+        }
+
+        .btn-reject {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-reject:hover {
+            background-color: #c0392b;
         }
 
         .no-data {
@@ -202,9 +236,48 @@
         .logout-btn:hover {
             text-decoration: underline;
         }
+
+        /* نافذة تكبير الصورة (Modal) مثل الواتساب */
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #modalImg {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+        }
+
+        #closeModalBtn {
+            margin-top: 15px;
+            background: #c5a059;
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+
+    <div id="imageModal" onclick="closeImageModal()">
+        <img id="modalImg" src="">
+        <button id="closeModalBtn" onclick="closeImageModal()">إغلاق المعاينة ✕</button>
+    </div>
 
     <div class="navbar">
         <div class="nav-brand">
@@ -225,7 +298,7 @@
         
         <div class="welcome-card">
             <h1 id="priestGreeting">أهلاً بك يا أبونا...</h1>
-            <p>سعداء برعايتكم لخدمة سر الإكليل، هنا تجد كافة المتابعات الخاصة بالمقبلين على الزواج.</p>
+            <p>سعداء برعايتكم لخدمة سر الإكليل، هنا تجد طلبات المعاينة والمستندات الواردة بقسم (check).</p>
         </div>
 
         <div class="verse-card">
@@ -235,12 +308,12 @@
 
         <div class="section-box">
             <h3>
-                <span>الباقات والطلبات المرتبطة برعايتكم</span>
+                <span>طلبات المعاينة والمستندات (check)</span>
                 <span style="font-size: 13px; color: #7f8c8d; font-weight: normal;">محدث تلقائياً</span>
             </h3>
             
-            <div id="priestPackagesList">
-                <div class="no-data">جاري جلب الباقات المخصصة لرعايتكم...</div>
+            <div id="checkCollectionList">
+                <div class="no-data">جاري جلب الطلبات والمستندات الخاصة برعايتكم...</div>
             </div>
         </div>
 
@@ -249,7 +322,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -267,42 +340,93 @@
         window.addEventListener('DOMContentLoaded', async () => {
             const assignedPriest = localStorage.getItem('assignedPriest');
             const greetingElement = document.getElementById('priestGreeting');
-            const listContainer = document.getElementById('priestPackagesList');
+            const listContainer = document.getElementById('checkCollectionList');
 
             if (!assignedPriest) {
                 window.location.href = "../index.html";
                 return;
             }
 
-            // عرض اسم أب الكاهن بطريقة آمنة تماماً وخالية من أخطاء الـ Syntax
             greetingElement.innerText = "أهلاً بك يا أبونا، " + assignedPriest + " ✝";
 
             try {
-                const q = query(collection(db, "WeddingPackages"), where("assignedPriest", "==", assignedPriest));
+                const q = query(collection(db, "check"), where("assignedPriest", "==", assignedPriest));
                 const querySnapshot = await getDocs(q);
 
                 if (querySnapshot.empty) {
-                    listContainer.innerHTML = `<div class="no-data">لا توجد طلبات أو باقات مسجلة معك حالياً.</div>`;
+                    listContainer.innerHTML = `<div class="no-data">لا توجد طلبات معاينة مسجلة معك في قسم check حالياً.</div>`;
                 } else {
                     let htmlContent = "";
                     querySnapshot.forEach((docSnap) => {
                         const data = docSnap.data();
+                        const docId = docSnap.id;
+                        const status = data.documentsStatus || 'قيد المراجعة';
+
                         htmlContent += `
                             <div class="package-item">
-                                <p style="margin-bottom: 5px;"><strong>رقم الحزمة (ID):</strong> ${docSnap.id}</p>
+                                <p style="margin-bottom: 5px;"><strong>رقم الطلب (ID):</strong> ${docId}</p>
                                 <p style="margin-bottom: 5px;"><strong>العريس:</strong> ${data.groom?.fullName || 'غير مسجل'}</p>
                                 <p style="margin-bottom: 5px;"><strong>العروسة:</strong> ${data.bride?.fullName || 'غير مسجل'}</p>
-                                <p style="margin-top: 8px;"><strong>حالة المستندات:</strong> <span style="color: #c5a059; font-weight: bold;">${data.documentsStatus || 'لم ترفع بعد'}</span></p>
+                                <p style="margin-bottom: 10px;"><strong>حالة الأوراق:</strong> <span style="color: #c5a059; font-weight: bold;">${status}</span></p>
+                                
+                                <div style="background: #fdfcf7; padding: 15px; border-radius: 8px; border: 1px dashed #c5a059; margin-top: 10px; text-align: center;">
+                                    <p style="font-size: 13px; color: #555; margin-bottom: 10px; text-align: right;">📋 <strong>معاينة المستندات:</strong></p>
+                                    
+                                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                                        <div>
+                                            <p style="font-size: 12px; margin-bottom: 5px; color: #333;">صورة البطاقة:</p>
+                                            ${data.idCardUrl ? `<img src="${data.idCardUrl}" alt="صورة البطاقة" style="width: 130px; height: 95px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer; transition: 0.3s;" onclick="openImageModal('${data.idCardUrl}')" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">` : '<span style="font-size:12px; color:#e74c3c;">لم تُرفع</span>'}
+                                        </div>
+
+                                        <div>
+                                            <p style="font-size: 12px; margin-bottom: 5px; color: #333;">شهادة الخلو:</p>
+                                            ${data.certificateUrl ? `<img src="${data.certificateUrl}" alt="شهادة الخلو" style="width: 130px; height: 95px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer; transition: 0.3s;" onclick="openImageModal('${data.certificateUrl}')" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">` : '<span style="font-size:12px; color:#e74c3c;">لم تُرفع</span>'}
+                                        </div>
+                                    </div>
+                                    <p style="font-size: 11px; color: #7f8c8d; margin-top: 8px;">(اضغط على أي صورة لتكبيرها وعرضها بوضوح)</p>
+                                </div>
+
+                                <div class="action-btns-group">
+                                    <button class="btn-accept" onclick="updateCheckStatus('${docId}', 'مقبولة')">قبول الأوراق ✅</button>
+                                    <button class="btn-reject" onclick="updateCheckStatus('${docId}', 'مرفوضة')">رفض الأوراق ❌</button>
+                                </div>
                             </div>
                         `;
                     });
                     listContainer.innerHTML = htmlContent;
                 }
             } catch (error) {
-                console.error("خطأ في جلب البيانات:", error);
+                console.error("خطأ في جلب بيانات check:", error);
                 listContainer.innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء تحميل البيانات، تأكد من الاتصال.</div>`;
             }
         });
+
+        // وظائف فتح وإغلاق نافذة تكبير الصورة
+        window.openImageModal = function(url) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            modalImg.src = url;
+            modal.style.display = 'flex';
+        }
+
+        window.closeImageModal = function() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+        }
+
+        window.updateCheckStatus = async function(docId, newStatus) {
+            try {
+                const docRef = doc(db, "check", docId);
+                await updateDoc(docRef, {
+                    documentsStatus: newStatus
+                });
+                alert("تم تحديث حالة المستندات بنجاح إلى: " + newStatus);
+                location.reload();
+            } catch (error) {
+                console.error("خطأ في تحديث الحالة:", error);
+                alert("حدث خطأ أثناء تحديث الحالة في قاعدة البيانات.");
+            }
+        };
     </script>
 </body>
 </html>

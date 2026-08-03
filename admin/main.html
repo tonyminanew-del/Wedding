@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم أب الكاهن - سر الإكليل</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* شريط التنقل العلوي */
+        .navbar {
+            width: 100%;
+            max-width: 900px;
+            background: #ffffff;
+            padding: 15px 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-top: 4px solid #c5a059;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .nav-brand span {
+            color: #c5a059;
+            font-size: 22px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            background: #fdfcf7;
+            border: 1.5px solid #e9ecef;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #c5a059;
+            font-size: 18px;
+            box-shadow: 0 2px 5px rgba(197, 160, 89, 0.1);
+        }
+
+        .icon-btn:hover {
+            background: #c5a059;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* نقطة الإشعارات الحمراء الصغيرة */
+        .badge-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 9px;
+            height: 9px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* بطاقة الترحيب */
+        .welcome-card {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+            color: #ffffff;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(44, 62, 80, 0.15);
+            text-align: right;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-card h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            color: #f39c12;
+        }
+
+        .welcome-card p {
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+
+        /* بطاقة الآية الروحية */
+        .verse-card {
+            background: #ffffff;
+            padding: 20px 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border-right: 5px solid #c5a059;
+            text-align: right;
+        }
+
+        .verse-card h4 {
+            color: #c5a059;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .verse-card blockquote {
+            font-size: 14px;
+            color: #555;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        /* قسم الباقات والحجوزات */
+        .section-box {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            text-align: right;
+        }
+
+        .section-box h3 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .package-item {
+            background: #fafbfc;
+            border: 1.5px solid #e9ecef;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .package-item:hover {
+            border-color: #c5a059;
+            transform: translateY(-1px);
+        }
+
+        .no-data {
+            text-align: center;
+            color: #888;
+            padding: 30px;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .logout-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-brand">
+            <span>✝</span> كهنة كنيسة الشهيد العظيم مارجرجس
+        </div>
+        <div class="nav-actions">
+            <a href="notification.html" class="icon-btn" title="الإشعارات">
+                🔔
+                <span class="badge-dot"></span>
+            </a>
+            <a href="profile.html" class="icon-btn" title="الملف الشخصي">
+                👤
+            </a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="welcome-card">
+            <h1 id="priestGreeting">أهلاً بك يا أبونا...</h1>
+            <p>سعداء برعايتكم لخدمة سر الإكليل، هنا تجد كافة المتابعات الخاصة بالمقبلين على الزواج.</p>
+        </div>
+
+        <div class="verse-card">
+            <h4>آية للخدمة والبركة 🕊️</h4>
+            <blockquote>"هكذا ليحسبنا الإنسان خداماً للمسيح ووكلاء سرائر الله." (1كو 4: 1)</blockquote>
+        </div>
+
+        <div class="section-box">
+            <h3>
+                <span>الباقات والطلبات المرتبطة برعايتكم</span>
+                <span style="font-size: 13px; color: #7f8c8d; font-weight: normal;">محدث تلقائياً</span>
+            </h3>
+            
+            <div id="priestPackagesList">
+                <div class="no-data">جاري جلب الباقات المخصصة لرعايتكم...</div>
+            </div>
+        </div>
+
+        <a href="../index.html" class="logout-btn">تسجيل الخروج ⟵</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
+          authDomain: "wedding-34f49.firebaseapp.com",
+          projectId: "wedding-34f49",
+          storageBucket: "wedding-34f49.firebasestorage.app",
+          messagingSenderId: "1071878294617",
+          appId: "1:1071878294617:web:5e7138d17a3aa78366f548",
+          measurementId: "G-69VMQJT1Z8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const assignedPriest = localStorage.getItem('assignedPriest');
+            const greetingElement = document.getElementById('priestGreeting');
+            const listContainer = document.getElementById('priestPackagesList');
+
+            if (!assignedPriest) {
+                window.location.href = "../index.html";
+                return;
+            }
+
+            // عرض اسم أب الكاهن بطريقة آمنة تماماً وخالية من أخطاء الـ Syntax
+            greetingElement.innerText = "أهلاً بك يا أبونا، " + assignedPriest + " ✝";
+
+            try {
+                const q = query(collection(db, "WeddingPackages"), where("assignedPriest", "==", assignedPriest));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    listContainer.innerHTML = `<div class="no-data">لا توجد طلبات أو باقات مسجلة معك حالياً.</div>`;
+                } else {
+                    let htmlContent = "";
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        htmlContent += `
+                            <div class="package-item">
+                                <p style="margin-bottom: 5px;"><strong>رقم الحزمة (ID):</strong> ${docSnap.id}</p>
+                                <p style="margin-bottom: 5px;"><strong>العريس:</strong> ${data.groom?.fullName || 'غير مسجل'}</p>
+                                <p style="margin-bottom: 5px;"><strong>العروسة:</strong> ${data.bride?.fullName || 'غير مسجل'}</p>
+                                <p style="margin-top: 8px;"><strong>حالة المستندات:</strong> <span style="color: #c5a059; font-weight: bold;">${data.documentsStatus || 'لم ترفع بعد'}</span></p>
+                            </div>
+                        `;
+                    });
+                    listContainer.innerHTML = htmlContent;
+                }
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+                listContainer.innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء تحميل البيانات، تأكد من الاتصال.</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

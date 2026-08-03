@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام حجز الأكاليل والخدمات الكنسية</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2c3e50;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+            border-top: 5px solid #d4af37; /* لون ذهبي هادئ وطابع روحي */
+        }
+
+        .cross-icon {
+            font-size: 36px;
+            color: #d4af37;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 13px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-user {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .btn-user:hover {
+            background-color: #1a252f;
+            transform: translateY(-2px);
+        }
+
+        .btn-admin {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            border: 1.5px solid #d4af37;
+            margin-top: 10px;
+        }
+
+        .btn-admin:hover {
+            background-color: #fffdf0;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="cross-icon">✝</div>
+        <h2>نظام حجز الأكاليل المقدسة</h2>
+        <p>الرجاء اختيار نوع الدخول للمتابعة</p>
+
+        <form action="user/user.html" method="get" class="form-group">
+            <button type="submit" class="btn-user">
+                دخول المستخدم (العريسان)
+            </button>
+        </form>
+
+        <form action="admin/admin.html" method="get" class="form-group">
+            <button type="submit" class="btn-admin">
+                دخول الإدارة (الخدمة)
+            </button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // إعدادات الكنيسة الخاصة بك
+        const firebaseConfig = {
+          apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
+          authDomain: "wedding-34f49.firebaseapp.com",
+          projectId: "wedding-34f49",
+          storageBucket: "wedding-34f49.firebasestorage.app",
+          messagingSenderId: "1071878294617",
+          appId: "1:1071878294617:web:5e7138d17a3aa78366f548",
+          measurementId: "G-69VMQJT1Z8"
+        };
+
+        // تهيئة Firebase وتفعيل قاعدة البيانات
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        console.log("تم اتصال Firebase Firestore بنجاح وجاهز للاستخدام!");
+    </script>
+
+</body>
+</html>

@@ -58,38 +58,37 @@
         const db = getFirestore(app);
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // استخدام الـ ID الحقيقي الموجود في قاعدة البيانات كقيمة افتراضية (221344)
+            // جلب الـ ID الافتراضي 221344 أو من التخزين المحلي
             let userCode = localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId') || "221344";
-            const localUserName = localStorage.getItem('userName') || "شريك الحياة";
-            const localUserRole = localStorage.getItem('userRole') || "عريس";
-            const localUserPhone = localStorage.getItem('userPhone') || "01203821967";
 
             document.getElementById('displayId').innerText = userCode;
 
             try {
-                // البحث في مجموعة WeddingPackages الصحيحة بناءً على صورة قاعدة البيانات لديك
                 const docRef = doc(db, "WeddingPackages", userCode);
                 const docSnap = await getDoc(docRef);
 
                 let groomName = 'غير مسجل';
                 let brideName = 'غير مسجل';
-                let phoneNum = localUserPhone;
+                let phoneNum = 'غير متوفر';
                 let docStatus = 'قيد المراجعة';
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
 
-                    // استخراج اسم العريس من حقل groom.fullName
+                    // جلب اسم العريس من groom.fullName
                     if (data.groom && data.groom.fullName && data.groom.fullName.trim() !== "") {
                         groomName = data.groom.fullName;
                     }
 
-                    // استخراج اسم العروسة من حقل bride.fullName
+                    // جلب اسم العروسة من bride.fullName
                     if (data.bride && data.bride.fullName && data.bride.fullName.trim() !== "") {
                         brideName = data.bride.fullName;
                     }
 
-                    phoneNum = data.phone || data.groom?.phone || data.bride?.phone || localUserPhone;
+                    // جلب رقم الهاتف من العريس أو العروسة
+                    phoneNum = data.groom?.phone || data.bride?.phone || 'غير متوفر';
+
+                    // جلب الحالة سواء كانت في documentsStatus أو groom.status
                     docStatus = data.documentsStatus || data.groom?.status || 'قيد المراجعة';
                 }
 
@@ -100,6 +99,7 @@
                 const statusBadge = document.getElementById('displayDocStatus');
                 statusBadge.innerText = docStatus;
 
+                // تفعيل زر المواعيد إذا كانت الحالة مقبولة
                 if (docStatus.trim() === 'مقبولة' || docStatus.includes('قبول')) {
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';

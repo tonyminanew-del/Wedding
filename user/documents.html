@@ -137,11 +137,11 @@
     <div class="container">
         <div class="cross-symbol">✝</div>
         <h2>رفع مستندات سر الإكليل</h2>
-        <p class="subtitle">يرجى رفع ملفات البطاقة الشخصية وشهادة الخلو من الموانع لإرسالها لأب الكاهن</p>
+        <p class="subtitle">يرجى رفع صور البطاقة الشخصية وشهادة الخلو من الموانع لإرسالها لأب الكاهن</p>
 
         <div id="uploadForm">
             <div class="form-group">
-                <label>1. صورة البطاقة الشخصية أو الـ PDF:</label>
+                <label>1. صورة البطاقة الشخصية:</label>
                 <div class="file-input-wrapper">
                     <input type="file" id="idCardFile" accept="image/*,.pdf">
                 </div>
@@ -158,12 +158,13 @@
             <div id="statusMessage"></div>
         </div>
 
-        <a href="home.html" class="back-link">⟵ العودة إلى لوحة المتابعة</a>
+        <a href="main.html" class="back-link">⟵ العودة إلى لوحة المتابعة</a>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -177,6 +178,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         const submitDocsBtn = document.getElementById('submitDocsBtn');
         const statusMessage = document.getElementById('statusMessage');
@@ -199,43 +201,57 @@
             }
 
             submitDocsBtn.disabled = true;
-            submitDocsBtn.textContent = "جاري رفع وإرسال المستندات...";
+            submitDocsBtn.textContent = "جاري رفع المستندات للسحاب...";
             statusMessage.style.color = "#3498db";
-            statusMessage.textContent = "يتم حفظ بيانات الأوراق في قاعدة البيانات...";
+            statusMessage.textContent = "يتم رفع الصور وحفظ الروابط في كولكشن photo...";
 
             try {
-                const checkDocRef = doc(db, "check", packageId);
-                const originalSnap = await getDoc(checkDocRef);
+                const idCardFile = idCardInput.files[0];
+                const certificateFile = certificateInput.files[0];
+
+                // إنشاء مسارات تخزين الملفات في Firebase Storage
+                const idCardRef = ref(storage, `documents/${packageId}/idCard_${Date.now()}`);
+                const certRef = ref(storage, `documents/${packageId}/certificate_${Date.now()}`);
+
+                // رفع الملفات الفعلية
+                const idCardSnapshot = await uploadBytes(idCardRef, idCardFile);
+                const certSnapshot = await uploadBytes(certRef, certificateFile);
+
+                // الحصول على الروابط المباشرة (Download URLs)
+                const idCardUrl = await getDownloadURL(idCardSnapshot.ref);
+                const certificateUrl = await getDownloadURL(certSnapshot.ref);
+
+                const originalDocRef = doc(db, "WeddingPackages", packageId);
+                const originalSnap = await getDoc(originalDocRef);
 
                 let packageData = {};
                 if (originalSnap.exists()) {
                     packageData = originalSnap.data();
                 }
 
-                const assignedPriestName = packageData.assignedPriest || localStorage.getItem('assignedPriest') || "أبونا إفرايم";
-
-                // حفظ أسماء الملفات المؤكدة لكي تظهر عند الكاهن بدلاً من خطأ حجم الصور
-                await setDoc(checkDocRef, {
+                // حفظ الروابط الحقيقية داخل كولكشن photo الجديد
+                const photoDocRef = doc(db, "photo", packageId);
+                await setDoc(photoDocRef, {
                     groom: packageData.groom || { fullName: "غير معروف" },
                     bride: packageData.bride || { fullName: "غير معروف" },
-                    assignedPriest: assignedPriestName,
+                    assignedPriest: packageData.assignedPriest || localStorage.getItem('assignedPriest') || "غير محدد",
                     documentsStatus: "قيد المراجعة",
-                    idCardName: idCardInput.files[0].name,          
-                    certificateName: certificateInput.files[0].name, 
+                    idCardUrl: idCardUrl,
+                    certificateUrl: certificateUrl,
                     submittedAt: new Date().toISOString()
                 }, { merge: true });
 
                 statusMessage.style.color = "#27ae60";
-                statusMessage.textContent = "تم إرسال المستندات وتحديث الحالة بنجاح إلى أب الكاهن ✝";
+                statusMessage.textContent = "تم إرسال المستندات وبروابط المعاينة بنجاح إلى أب الكاهن ✝";
 
                 setTimeout(() => {
-                    window.location.href = "home.html";
-                }, 2000);
+                    window.location.href = "main.html";
+                }, 2500);
 
             } catch (error) {
                 console.error("خطأ في رفع المستندات:", error);
                 statusMessage.style.color = "#e74c3c";
-                statusMessage.textContent = "حدث خطأ أثناء الاتصال بقاعدة البيانات، تأكد من قواعد الأمان (Firestore Rules).";
+                statusMessage.textContent = "حدث خطأ أثناء رفع المستندات، تأكد من إعدادات Storage Rules.";
                 submitDocsBtn.disabled = false;
                 submitDocsBtn.textContent = "إرسال المستندات إلى أب الكاهن ✝";
             }

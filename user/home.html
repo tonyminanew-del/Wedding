@@ -28,10 +28,10 @@
         <p class="subtitle">متابعة تفاصيل الباقة وحالة المستندات ومواعيد الفرح</p>
 
         <div class="info-box" id="userInfoBox">
-            <p><strong>معرف الحزمة (ID):</strong> <span id="displayId">جاري التحميل...</span></p>
-            <p><strong>اسم العريس:</strong> <span id="displayGroom">جاري التحميل...</span></p>
-            <p><strong>اسم العروسة:</strong> <span id="displayBride">جاري التحميل...</span></p>
-            <p><strong>رقم الهاتف:</strong> <span id="displayPhone">جاري التحميل...</span></p>
+            <p><strong>معرف الحزمة (ID):</strong> <span id="displayId">221344</span></p>
+            <p><strong>اسم العريس:</strong> <span id="displayGroom">توني</span></p>
+            <p><strong>اسم العروسة:</strong> <span id="displayBride">غير مسجل</span></p>
+            <p><strong>رقم الهاتف:</strong> <span id="displayPhone">01203821967</span></p>
             <p><strong>حالة المستندات:</strong> <span class="status-badge" id="displayDocStatus">قيد المراجعة</span></p>
         </div>
 
@@ -58,55 +58,36 @@
         const db = getFirestore(app);
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // جلب الـ ID الافتراضي 221344 أو من التخزين المحلي
             let userCode = localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId') || "221344";
-
             document.getElementById('displayId').innerText = userCode;
 
             try {
                 const docRef = doc(db, "WeddingPackages", userCode);
                 const docSnap = await getDoc(docRef);
 
-                let groomName = 'غير مسجل';
-                let brideName = 'غير مسجل';
-                let phoneNum = 'غير متوفر';
-                let docStatus = 'قيد المراجعة';
-
                 if (docSnap.exists()) {
                     const data = docSnap.data();
 
-                    // جلب اسم العريس من groom.fullName
-                    if (data.groom && data.groom.fullName && data.groom.fullName.trim() !== "") {
-                        groomName = data.groom.fullName;
+                    let groomName = (data.groom && data.groom.fullName) ? data.groom.fullName : 'توني';
+                    let brideName = (data.bride && data.bride.fullName) ? data.bride.fullName : 'غير مسجل';
+                    let phoneNum = data.groom?.phone || data.bride?.phone || '01203821967';
+                    let docStatus = data.documentsStatus || data.groom?.status || 'قيد المراجعة';
+
+                    document.getElementById('displayGroom').innerText = groomName;
+                    document.getElementById('displayBride').innerText = brideName;
+                    document.getElementById('displayPhone').innerText = phoneNum;
+
+                    const statusBadge = document.getElementById('displayDocStatus');
+                    statusBadge.innerText = docStatus;
+
+                    if (docStatus.trim() === 'مقبولة' || docStatus.includes('قبول')) {
+                        statusBadge.style.backgroundColor = '#d4edda';
+                        statusBadge.style.color = '#155724';
+                        document.getElementById('appointmentBtn').style.display = 'block';
                     }
-
-                    // جلب اسم العروسة من bride.fullName
-                    if (data.bride && data.bride.fullName && data.bride.fullName.trim() !== "") {
-                        brideName = data.bride.fullName;
-                    }
-
-                    // جلب رقم الهاتف من العريس أو العروسة
-                    phoneNum = data.groom?.phone || data.bride?.phone || 'غير متوفر';
-
-                    // جلب الحالة سواء كانت في documentsStatus أو groom.status
-                    docStatus = data.documentsStatus || data.groom?.status || 'قيد المراجعة';
-                }
-
-                document.getElementById('displayGroom').innerText = groomName;
-                document.getElementById('displayBride').innerText = brideName;
-                document.getElementById('displayPhone').innerText = phoneNum;
-
-                const statusBadge = document.getElementById('displayDocStatus');
-                statusBadge.innerText = docStatus;
-
-                // تفعيل زر المواعيد إذا كانت الحالة مقبولة
-                if (docStatus.trim() === 'مقبولة' || docStatus.includes('قبول')) {
-                    statusBadge.style.backgroundColor = '#d4edda';
-                    statusBadge.style.color = '#155724';
-                    document.getElementById('appointmentBtn').style.display = 'block';
                 }
             } catch (error) {
-                console.error("خطأ في جلب البيانات:", error);
+                console.error("خطأ في الاتصال، يتم عرض البيانات الافتراضية:", error);
             }
         });
     </script>

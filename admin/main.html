@@ -5,286 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم أب الكاهن - سر الإكليل</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh; color: #2c3e50; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .navbar { width: 100%; max-width: 900px; background: #ffffff; padding: 15px 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-top: 4px solid #c5a059; }
+        .nav-brand { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; color: #2c3e50; }
+        .nav-brand span { color: #c5a059; font-size: 22px; }
+        
+        .nav-icons { display: flex; gap: 12px; }
+        .icon-btn { background: #f8f9fa; border: 1.5px solid #e9ecef; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.3s; text-decoration: none; color: #2c3e50; }
+        .icon-btn:hover { background: #c5a059; color: white; border-color: #c5a059; }
 
-        body {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            min-height: 100vh;
-            color: #2c3e50;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        .main-container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .welcome-card { background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%); color: #ffffff; padding: 30px; border-radius: 18px; box-shadow: 0 10px 25px rgba(44, 62, 80, 0.15); text-align: right; }
+        .welcome-card h1 { font-size: 26px; margin-bottom: 8px; color: #f39c12; }
+        .welcome-card p { font-size: 14px; color: #bdc3c7; margin-bottom: 15px; }
+        
+        .bible-verse-box { background: rgba(255, 255, 255, 0.08); padding: 14px 18px; border-radius: 10px; margin-top: 12px; font-size: 13px; color: #ecf0f1; border-right: 3px solid #c5a059; line-height: 1.6; }
+        .bible-verse-box cite { display: block; margin-top: 5px; color: #f39c12; font-size: 12px; font-style: normal; font-weight: bold; }
 
-        .navbar {
-            width: 100%;
-            max-width: 900px;
-            background: #ffffff;
-            padding: 15px 25px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            border-top: 4px solid #c5a059;
-        }
+        .priest-actions-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
+        .priest-action-btn { background-color: #c5a059; color: white; border: none; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.3s; display: flex; align-items: center; gap: 6px; text-decoration: none; }
+        .priest-action-btn:hover { background-color: #b08d48; }
 
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 17px;
-            font-weight: 700;
-            color: #2c3e50;
-        }
-
-        .nav-brand span {
-            color: #c5a059;
-            font-size: 22px;
-        }
-
-        .main-container {
-            width: 100%;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .welcome-card {
-            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
-            color: #ffffff;
-            padding: 30px;
-            border-radius: 18px;
-            box-shadow: 0 10px 25px rgba(44, 62, 80, 0.15);
-            text-align: right;
-        }
-
-        .welcome-card h1 {
-            font-size: 26px;
-            margin-bottom: 8px;
-            color: #f39c12;
-        }
-
-        .welcome-card p {
-            font-size: 14px;
-            color: #bdc3c7;
-        }
-
-        .section-box {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 18px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            text-align: right;
-        }
-
-        .section-box h3 {
-            font-size: 18px;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .request-row-summary {
-            background: #fafbfc;
-            border: 1.5px solid #e9ecef;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-        }
-
-        .request-row-summary:hover {
-            border-color: #c5a059;
-            background: #fff;
-        }
-
-        .summary-info h4 {
-            font-size: 15px;
-            color: #2c3e50;
-            margin-bottom: 4px;
-        }
-
-        .summary-info p {
-            font-size: 13px;
-            color: #7f8c8d;
-        }
-
-        .link-details-btn {
-            background-color: #c5a059;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        .link-details-btn:hover {
-            background-color: #b08d48;
-        }
-
-        #detailsModal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: #ffffff;
-            width: 100%;
-            max-width: 650px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            text-align: right;
-            position: relative;
-        }
-
-        .close-modal {
-            position: absolute;
-            left: 20px;
-            top: 20px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-section {
-            background: #fdfcf7;
-            border: 1px dashed #c5a059;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .action-row-modal {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f4f6f9;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-accept {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            padding: 7px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-        }
+        .section-box { background: #ffffff; padding: 25px; border-radius: 18px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); text-align: right; display: none; }
+        .section-box.active { display: block; }
+        
+        .section-box h3 { font-size: 18px; color: #2c3e50; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        
+        .request-row-summary { background: #fafbfc; border: 1.5px solid #e9ecef; padding: 15px 20px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .request-row-summary:hover { border-color: #c5a059; background: #fff; }
+        .summary-info h4 { font-size: 15px; color: #2c3e50; margin-bottom: 4px; }
+        .summary-info p { font-size: 13px; color: #7f8c8d; }
+        .link-details-btn { background-color: #2c3e50; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.3s; }
+        .link-details-btn:hover { background-color: #1a252f; }
+        
+        #detailsModal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #ffffff; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: right; position: relative; }
+        .close-modal { position: absolute; left: 20px; top: 20px; background: #e74c3c; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+        .modal-section { background: #fdfcf7; border: 1.5px dashed #c5a059; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: center; }
+        
+        .action-row-modal { display: flex; justify-content: space-between; align-items: center; background: #f4f6f9; padding: 12px 15px; border-radius: 8px; margin-top: 12px; flex-wrap: wrap; gap: 10px; }
+        .btn-group { display: flex; gap: 8px; }
+        .btn-accept { background-color: #27ae60; color: white; border: none; padding: 7px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; }
         .btn-accept:hover { background-color: #219653; }
-
-        .btn-reject {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 7px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-        }
+        .btn-reject { background-color: #e74c3c; color: white; border: none; padding: 7px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; }
         .btn-reject:hover { background-color: #c0392b; }
-
-        #imageModal {
-            display: none;
-            position: fixed;
-            z-index: 10000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        #modalImg {
-            max-width: 90%;
-            max-height: 80vh;
-            border-radius: 8px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
-        }
-
-        #closeImgBtn {
-            margin-top: 15px;
-            background: #c5a059;
-            color: white;
-            border: none;
-            padding: 8px 25px;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .no-data {
-            text-align: center;
-            color: #888;
-            padding: 30px;
-            font-size: 14px;
-        }
-
-        .logout-btn {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #e74c3c;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 650;
-        }
+        
+        #imageModal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; flex-direction: column; }
+        #modalImg { max-width: 90%; max-height: 80vh; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
+        #closeImgBtn { margin-top: 15px; background: #c5a059; color: white; border: none; padding: 8px 25px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: bold; }
+        .no-data { text-align: center; color: #888; padding: 30px; font-size: 14px; }
+        .logout-btn { display: block; text-align: center; margin-top: 20px; color: #e74c3c; text-decoration: none; font-size: 13px; font-weight: 650; }
     </style>
 </head>
 <body>
@@ -304,19 +77,34 @@
 
     <div class="navbar">
         <div class="nav-brand">
-            <span>✝</span> كهنة كنيسة الشهيد العظيم مارجرجس
+            <span>✝</span> كنيسة الشهيد العظيم مارجرجس
+        </div>
+        <div class="nav-icons">
+            <a href="profile.html" class="icon-btn" title="الملف الشخصي">👤</a>
+            <a href="setting.html" class="icon-btn" title="الإعدادات">⚙️</a>
         </div>
     </div>
 
     <div class="main-container">
         <div class="welcome-card">
             <h1 id="priestGreeting">أهلاً بك يا أبونا...</h1>
-            <p>قائمة الطلبات تظهر بشكل مبسط ومضغوط، اضغط على "عرض تفاصيل الطلب" لإظهار المستندات والقرارات.</p>
+            <p>مرحباً بك في لوحة الإشراف الرعوي لمتابعة طلبات الإكليل والمستندات الخاصة بالمقبلين على الزواج.</p>
+            
+            <div class="bible-verse-box">
+                "هكَذَا لِيَحْسِبْنَا الإِنْسَانُ كَخُدَّمِ لِلْمَسِيحِ، وَوُكَلاَءِ سِرَائِرِ اللهِ."
+                <cite>(1 كورنثوس 4: 1)</cite>
+            </div>
+
+            <div class="priest-actions-bar">
+                <button class="priest-action-btn" onclick="toggleRequestsSection()">📋 قائمة الطلبات الواردة</button>
+                <a href="chat.html" class="priest-action-btn">💬 الرسائل والردود (chat)</a>
+                <a href="clock.html" class="priest-action-btn">📅 تنظيم الوقت والمواعيد (clock)</a>
+            </div>
         </div>
 
-        <div class="section-box">
+        <div class="section-box" id="requestsSectionBox">
             <h3>
-                <span>قائمة الطلبات الواردة (photo)</span>
+                <span>طلبات سر الإكليل الواردة</span>
                 <span style="font-size: 13px; color: #7f8c8d; font-weight: normal;" id="totalCount">جاري العد...</span>
             </h3>
             
@@ -351,8 +139,6 @@
         window.addEventListener('DOMContentLoaded', async () => {
             currentAssignedPriest = localStorage.getItem('assignedPriest');
             const greetingElement = document.getElementById('priestGreeting');
-            const listContainer = document.getElementById('checkCollectionList');
-            const totalCountElement = document.getElementById('totalCount');
 
             if (!currentAssignedPriest) {
                 window.location.href = "../index.html";
@@ -360,22 +146,46 @@
             }
 
             greetingElement.innerText = "أهلاً بك يا أبونا، " + currentAssignedPriest + " ✝";
+            await loadRequestsData();
+        });
+
+        window.toggleRequestsSection = async function() {
+            const box = document.getElementById('requestsSectionBox');
+            if (box.classList.contains('active')) {
+                box.classList.remove('active');
+            } else {
+                box.classList.add('active');
+                await loadRequestsData();
+            }
+        }
+
+        async function loadRequestsData() {
+            const listContainer = document.getElementById('checkCollectionList');
+            const totalCountElement = document.getElementById('totalCount');
 
             try {
-                // جلب الطلبات من كولكشن photo الجديد
-                const q = query(collection(db, "photo"), where("assignedPriest", "==", currentAssignedPriest));
+                const q = query(collection(db, "check"), where("assignedPriest", "==", currentAssignedPriest));
                 const querySnapshot = await getDocs(q);
 
                 if (querySnapshot.empty) {
-                    listContainer.innerHTML = `<div class="no-data">لا توجد طلبات مسجلة معك في قسم photo حالياً.</div>`;
+                    listContainer.innerHTML = `<div class="no-data">لا توجد طلبات مسجلة معك حالياً.</div>`;
                     totalCountElement.innerText = "الإجمالي: 0 طلب";
                 } else {
                     let htmlContent = "";
                     let count = 0;
+                    const currentTime = new Date().getTime();
 
                     querySnapshot.forEach((docSnap) => {
                         const data = docSnap.data();
                         const docId = docSnap.id;
+
+                        if (data.approvalTimestamp) {
+                            const elapsedHours = (currentTime - data.approvalTimestamp) / (1000 * 60 * 60);
+                            if (elapsedHours >= 24) {
+                                return;
+                            }
+                        }
+
                         globalRequestsData[docId] = data;
                         count++;
 
@@ -394,14 +204,18 @@
                         `;
                     });
 
-                    listContainer.innerHTML = htmlContent;
+                    if (count === 0) {
+                        listContainer.innerHTML = `<div class="no-data">لا توجد طلبات نشطة حالياً (تمت الأرشفة بعد مرور 24 ساعة على القبول).</div>`;
+                    } else {
+                        listContainer.innerHTML = htmlContent;
+                    }
                     totalCountElement.innerText = `الإجمالي: ${count} طلب`;
                 }
             } catch (error) {
-                console.error("خطأ في جلب بيانات photo:", error);
-                listContainer.innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء تحميل البيانات.</div>`;
+                console.error("خطأ في جلب بيانات check:", error);
+                listContainer.innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء تحميل البيانات. تأكد من إعدادات القواعد (Rules).</div>`;
             }
-        });
+        }
 
         window.openRequestDetails = function(docId) {
             const data = globalRequestsData[docId];
@@ -429,15 +243,15 @@
                 </div>
 
                 <div class="modal-section">
-                    <p style="font-size: 13px; color: #555; margin-bottom: 8px; font-weight: bold;">📋 معاينة المستندات (اضغط على الصورة للتكبير):</p>
+                    <p style="font-size: 13px; color: #555; margin-bottom: 8px; font-weight: bold;">📋 معاينة المستندات المباشرة (اضغط لتكبير الصورة):</p>
                     <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                         <div>
                             <p style="font-size: 11px; margin-bottom: 3px;">صورة البطاقة:</p>
-                            ${data.idCardUrl ? `<img src="${data.idCardUrl}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer;" onclick="openImageModal('${data.idCardUrl}')">` : '<span style="font-size:11px; color:#e74c3c;">لم تُرفع</span>'}
+                            ${data.idCardUrl ? `<img src="${data.idCardUrl}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer;" onclick="openImageModal('${data.idCardUrl}')">` : '<span style="font-size:11px; color:#e74c3c;">لم تُرفع بعد</span>'}
                         </div>
                         <div>
                             <p style="font-size: 11px; margin-bottom: 3px;">شهادة الخلو:</p>
-                            ${data.certificateUrl ? `<img src="${data.certificateUrl}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer;" onclick="openImageModal('${data.certificateUrl}')">` : '<span style="font-size:11px; color:#e74c3c;">لم تُرفع</span>'}
+                            ${data.certificateUrl ? `<img src="${data.certificateUrl}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer;" onclick="openImageModal('${data.certificateUrl}')">` : '<span style="font-size:11px; color:#e74c3c;">لم تُرفع بعد</span>'}
                         </div>
                     </div>
                 </div>
@@ -489,24 +303,21 @@
                 const now = new Date();
                 const timeString = now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
                 
-                let updateData = {
-                    [fieldName]: value
-                };
+                let updateData = { [fieldName]: value };
+
+                if ((fieldName === 'documentsStatus' && value === 'مقبولة') || (fieldName === 'appointmentStatus' && value === 'ميعاد مقبول')) {
+                    updateData.approvalTimestamp = now.getTime();
+                }
 
                 if (fieldName === 'documentsStatus') {
                     updateData.documentsActionBy = currentAssignedPriest;
                     updateData.documentsActionTime = timeString;
-                    globalRequestsData[docId].documentsActionBy = currentAssignedPriest;
-                    globalRequestsData[docId].documentsActionTime = timeString;
                 } else if (fieldName === 'appointmentStatus') {
                     updateData.appointmentActionBy = currentAssignedPriest;
                     updateData.appointmentActionTime = timeString;
-                    globalRequestsData[docId].appointmentActionBy = currentAssignedPriest;
-                    globalRequestsData[docId].appointmentActionTime = timeString;
                 }
 
-                // التحديث يتم داخل كولكشن photo
-                const docRef = doc(db, "photo", docId);
+                const docRef = doc(db, "check", docId);
                 await updateDoc(docRef, updateData);
                 
                 globalRequestsData[docId][fieldName] = value;

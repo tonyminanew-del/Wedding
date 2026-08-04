@@ -97,7 +97,6 @@
             align-items: center;
         }
 
-        /* سطر الطلب المختصر */
         .request-row-summary {
             background: #fafbfc;
             border: 1.5px solid #e9ecef;
@@ -142,7 +141,6 @@
             background-color: #b08d48;
         }
 
-        /* نافذة تفاصيل الطلب المنبثقة */
         #detailsModal {
             display: none;
             position: fixed;
@@ -238,7 +236,6 @@
         }
         .btn-reject:hover { background-color: #c0392b; }
 
-        /* نافذة تكبير الصورة المنفصلة */
         #imageModal {
             display: none;
             position: fixed;
@@ -319,7 +316,7 @@
 
         <div class="section-box">
             <h3>
-                <span>قائمة الطلبات الواردة (check)</span>
+                <span>قائمة الطلبات الواردة (photo)</span>
                 <span style="font-size: 13px; color: #7f8c8d; font-weight: normal;" id="totalCount">جاري العد...</span>
             </h3>
             
@@ -365,11 +362,12 @@
             greetingElement.innerText = "أهلاً بك يا أبونا، " + currentAssignedPriest + " ✝";
 
             try {
-                const q = query(collection(db, "check"), where("assignedPriest", "==", currentAssignedPriest));
+                // جلب الطلبات من كولكشن photo الجديد
+                const q = query(collection(db, "photo"), where("assignedPriest", "==", currentAssignedPriest));
                 const querySnapshot = await getDocs(q);
 
                 if (querySnapshot.empty) {
-                    listContainer.innerHTML = `<div class="no-data">لا توجد طلبات مسجلة معك في قسم check حالياً.</div>`;
+                    listContainer.innerHTML = `<div class="no-data">لا توجد طلبات مسجلة معك في قسم photo حالياً.</div>`;
                     totalCountElement.innerText = "الإجمالي: 0 طلب";
                 } else {
                     let htmlContent = "";
@@ -400,7 +398,7 @@
                     totalCountElement.innerText = `الإجمالي: ${count} طلب`;
                 }
             } catch (error) {
-                console.error("خطأ في جلب بيانات check:", error);
+                console.error("خطأ في جلب بيانات photo:", error);
                 listContainer.innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء تحميل البيانات.</div>`;
             }
         });
@@ -482,7 +480,8 @@
         }
 
         window.closeImageModal = function() {
-            document.getElementById('imageModal').style.display = 'none';
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
         }
 
         window.updateField = async function(docId, fieldName, value) {
@@ -506,12 +505,12 @@
                     globalRequestsData[docId].appointmentActionTime = timeString;
                 }
 
-                const docRef = doc(db, "check", docId);
+                // التحديث يتم داخل كولكشن photo
+                const docRef = doc(db, "photo", docId);
                 await updateDoc(docRef, updateData);
                 
                 globalRequestsData[docId][fieldName] = value;
 
-                // تحديث النصوص داخل النافذة المنبثقة فوراً
                 if (fieldName === 'documentsStatus') {
                     const span = document.getElementById(`modal-doc-status-${docId}`);
                     if (span) span.innerText = value;

@@ -58,10 +58,11 @@
         const db = getFirestore(app);
 
         window.addEventListener('DOMContentLoaded', async () => {
+            // استخدام الـ ID الافتراضي 221344 المطابق لقاعدة البيانات لديك
             let userCode = localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId') || "221344";
             const localUserName = localStorage.getItem('userName');
             const localUserRole = localStorage.getItem('userRole');
-            const localUserPhone = localStorage.getItem('userPhone') || "غير متوفر";
+            const localUserPhone = localStorage.getItem('userPhone');
 
             document.getElementById('displayId').innerText = userCode;
 
@@ -71,7 +72,7 @@
 
                 let groomName = 'غير مسجل';
                 let brideName = 'غير مسجل';
-                let phoneNum = localUserPhone;
+                let phoneNum = 'غير متوفر';
                 let docStatus = 'قيد المراجعة';
 
                 if (docSnap.exists()) {
@@ -79,21 +80,14 @@
 
                     if (data.groom && data.groom.fullName && data.groom.fullName.trim() !== "") {
                         groomName = data.groom.fullName;
-                    } else if (localUserRole === 'عريس' && localUserName) {
-                        groomName = localUserName;
                     }
 
                     if (data.bride && data.bride.fullName && data.bride.fullName.trim() !== "") {
                         brideName = data.bride.fullName;
-                    } else if (localUserRole === 'عروسة' && localUserName) {
-                        brideName = localUserName;
                     }
 
-                    phoneNum = data.phone || data.groom?.phone || data.bride?.phone || localUserPhone;
-                    docStatus = data.documentsStatus || 'قيد المراجعة';
-                } else {
-                    if (localUserRole === 'عريس' && localUserName) groomName = localUserName;
-                    if (localUserRole === 'عروسة' && localUserName) brideName = localUserName;
+                    phoneNum = data.groom?.phone || data.bride?.phone || localUserPhone || 'غير متوفر';
+                    docStatus = data.documentsStatus || data.groom?.status || 'قيد المراجعة';
                 }
 
                 document.getElementById('displayGroom').innerText = groomName;

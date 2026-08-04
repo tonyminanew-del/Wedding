@@ -188,12 +188,12 @@
     </div>
 
     <script>
-        // دالة مسؤولة عن تسجيل الخروج ومسح التخزين المؤقت
         function handleLogout(event) {
             event.preventDefault();
             localStorage.removeItem('userId');
             localStorage.removeItem('userRole');
             localStorage.removeItem('userName');
+            localStorage.removeItem('userPhone');
             window.location.href = 'index.html';
         }
     </script>
@@ -217,7 +217,7 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             const packageId = localStorage.getItem('userId');
-            const myRole = localStorage.getItem('userRole'); // 'عريس' أو 'عروسة'
+            const myRole = localStorage.getItem('userRole'); 
             const myStoredName = localStorage.getItem('userName') || '';
             const dataCard = document.getElementById('dataCard');
             const calendarButtonWrapper = document.getElementById('calendarButtonWrapper');
@@ -225,7 +225,7 @@
             console.log("Current Package ID from localStorage:", packageId);
 
             if (!packageId) {
-                dataCard.innerHTML = '<p class="no-data">لا توجد بيانات مسجلة حالياً، يرجى التسجيل أولاً.</p>';
+                dataCard.innerHTML = '<p class="no-data">لا توجد بيانات مسجلة حالياً، يرجى التسجيل أو تسجيل الدخول أولاً.</p>';
                 calendarButtonWrapper.innerHTML = '';
                 return;
             }
@@ -319,7 +319,7 @@
                 }
             } catch (error) {
                 console.error("خطأ في جلب بيانات الباقة:", error);
-                dataCard.innerHTML = '<p class="no-data">حدث خطأ أثناء تحميل البيانات، تأكد من الاتصال بالإنترنت.</p>';
+                dataCard.innerHTML = '<p class="no-data">حدث خطأ أثناء تحميل البيانات، تأكد من تعديل قواعد Firestore Rules.</p>';
             }
         });
     </script>

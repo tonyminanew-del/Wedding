@@ -186,12 +186,12 @@
             <button type="submit" id="submitBtn">موافق (OK) وحفظ الحزمة</button>
         </form>
 
-        <a href="../index.html" class="back-link">العودة إلى الصفحة الرئيسية</a>
+        <a href="index.html" class="back-link">العودة إلى الصفحة الرئيسية</a>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -206,7 +206,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // إظهار أو إخفاء الحقول حسب الاختيار
+        // إظهار أو إخفاء حقول الـ ID بناءً على اختيار المستخدم
         document.getElementById('idOption').addEventListener('change', function() {
             const idInputGroup = document.getElementById('idInputGroup');
             const newIdGroup = document.getElementById('newIdGroup');
@@ -225,7 +225,7 @@
             }
         });
 
-        // البحث التلقائي وإظهار بيانات الطرف الآخر بمجرد الانتهاء من كتابة الـ ID والضغط خارجه
+        // استعلام فوري لمعرفة اسم الطرف الآخر عند إدخال الكود (البحث في مجموعة check)
         document.getElementById('partnerId').addEventListener('blur', async function() {
             const packageId = this.value.trim();
             const infoBox = document.getElementById('partnerInfoBox');
@@ -233,14 +233,13 @@
             if (!packageId) return;
 
             try {
-                const docRef = doc(db, "WeddingPackages", packageId);
+                const docRef = doc(db, "check", packageId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     let infoText = "";
 
-                    // التحقق مما إذا كان المسجل المسبق هو عريس أو عروسة لعرضه تلقائياً
                     if (data.groom && data.groom.phone && data.groom.phone !== "") {
                         infoText = `الطرف المسجل مسبقاً (العريس): <strong>${data.groom.fullName}</strong>`;
                     } else if (data.bride && data.bride.phone && data.bride.phone !== "") {
@@ -273,7 +272,7 @@
             try {
                 if (idOption === 'إنشاء ID جديد') {
                     const packageId = document.getElementById('myCustomId').value.trim();
-                    const docRef = doc(db, "WeddingPackages", packageId);
+                    const docRef = doc(db, "check", packageId);
                     const docSnap = await getDoc(docRef);
 
                     if (docSnap.exists()) {
@@ -282,9 +281,8 @@
                     }
 
                     const packageData = {
-                        packageId: packageId,
-                        status: "قيد المراجعة",
-                        createdAt: new Date()
+                        documentsStatus: "لم تقم بالرفع بعد",
+                        createdAt: new Date().toISOString()
                     };
 
                     if (role === 'عريس') {
@@ -297,17 +295,18 @@
 
                     await setDoc(docRef, packageData);
 
+                    // تخزين البيانات في LocalStorage للانتقال لصفحة المتابعة
                     localStorage.setItem('userName', fullName);
                     localStorage.setItem('userRole', role);
                     localStorage.setItem('userId', packageId);
                     localStorage.setItem('userPhone', phone);
 
-                    alert(`تم إنشاء الباقة بنجاح!\nالـ ID المشترك للباقة هو: ${packageId}`);
+                    alert(`تم إنشاء الباقة بنجاح!\nالـ ID الخاص بك هو: ${packageId}`);
                     window.location.href = 'home.html';
 
                 } else {
                     const packageId = document.getElementById('partnerId').value.trim();
-                    const docRef = doc(db, "WeddingPackages", packageId);
+                    const docRef = doc(db, "check", packageId);
                     const docSnap = await getDoc(docRef);
 
                     if (!docSnap.exists()) {
@@ -317,11 +316,11 @@
 
                     const pkgData = docSnap.data();
 
-                    if (role === 'عريس' && pkgData.groom && pkgData.groom.phone !== "") {
+                    if (role === 'عريس' && pkgData.groom && pkgData.groom.phone && pkgData.groom.phone !== "") {
                         alert("هذه الباقة مسجل فيها عريس بالفعل!");
                         return;
                     }
-                    if (role === 'عروسة' && pkgData.bride && pkgData.bride.phone !== "") {
+                    if (role === 'عروسة' && pkgData.bride && pkgData.bride.phone && pkgData.bride.phone !== "") {
                         alert("هذه الباقة مسجل فيها عروسة بالفعل!");
                         return;
                     }
@@ -335,6 +334,7 @@
 
                     await updateDoc(docRef, updateData);
 
+                    // تخزين البيانات في LocalStorage للانتقال لصفحة المتابعة
                     localStorage.setItem('userName', fullName);
                     localStorage.setItem('userRole', role);
                     localStorage.setItem('userId', packageId);
@@ -346,7 +346,7 @@
 
             } catch (error) {
                 console.error("خطأ في الاتصال بقاعدة البيانات: ", error);
-                alert("حدث خطأ أثناء الحفظ، تأكد من اتصال الإنترنت وصلاحيات قاعدة البيانات.");
+                alert("حدث خطأ أثناء الحفظ، تأكد من اتصال الإنترنت وصلاحيات قاعدة البيانات (Firestore Rules).");
             }
         });
     </script>

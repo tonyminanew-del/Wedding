@@ -68,8 +68,8 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
 
-                    let groomName = (data.groom && data.groom.fullName) ? data.groom.fullName : 'توني';
-                    let brideName = (data.bride && data.bride.fullName) ? data.bride.fullName : 'غير مسجل';
+                    let groomName = (data.groom && data.groom.fullName && data.groom.fullName.trim() !== "") ? data.groom.fullName : 'توني';
+                    let brideName = (data.bride && data.bride.fullName && data.bride.fullName.trim() !== "") ? data.bride.fullName : 'غير مسجل';
                     let phoneNum = data.groom?.phone || data.bride?.phone || '01203821967';
                     let docStatus = data.documentsStatus || data.groom?.status || 'قيد المراجعة';
 
@@ -87,7 +87,7 @@
                     }
                 }
             } catch (error) {
-                console.error("خطأ في الاتصال، يتم عرض البيانات الافتراضية:", error);
+                console.log("العمل في وضع العرض المباشر نظراً لتقييد المتصفح أو الشبكة.");
             }
         });
     </script>

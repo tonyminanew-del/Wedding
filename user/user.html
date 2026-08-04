@@ -186,7 +186,6 @@
             <button type="submit" id="submitBtn">موافق (OK) وحفظ الحزمة</button>
         </form>
 
-        <a href="index.html" class="back-link">العودة إلى الصفحة الرئيسية</a>
     </div>
 
     <script type="module">
@@ -206,7 +205,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // إظهار أو إخفاء حقول الـ ID بناءً على اختيار المستخدم
         document.getElementById('idOption').addEventListener('change', function() {
             const idInputGroup = document.getElementById('idInputGroup');
             const newIdGroup = document.getElementById('newIdGroup');
@@ -225,7 +223,7 @@
             }
         });
 
-        // استعلام فوري لمعرفة اسم الطرف الآخر عند إدخال الكود (البحث في مجموعة check)
+        // البحث الفوري في مجموعة WeddingPackages بدلاً من check
         document.getElementById('partnerId').addEventListener('blur', async function() {
             const packageId = this.value.trim();
             const infoBox = document.getElementById('partnerInfoBox');
@@ -233,16 +231,16 @@
             if (!packageId) return;
 
             try {
-                const docRef = doc(db, "check", packageId);
+                const docRef = doc(db, "WeddingPackages", packageId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     let infoText = "";
 
-                    if (data.groom && data.groom.phone && data.groom.phone !== "") {
+                    if (data.groom && data.groom.fullName && data.groom.fullName !== "") {
                         infoText = `الطرف المسجل مسبقاً (العريس): <strong>${data.groom.fullName}</strong>`;
-                    } else if (data.bride && data.bride.phone && data.bride.phone !== "") {
+                    } else if (data.bride && data.bride.fullName && data.bride.fullName !== "") {
                         infoText = `الطرف المسجل مسبقاً (العروسة): <strong>${data.bride.fullName}</strong>`;
                     } else {
                         infoText = "هذه الباقة فارغة حالياً.";
@@ -272,7 +270,7 @@
             try {
                 if (idOption === 'إنشاء ID جديد') {
                     const packageId = document.getElementById('myCustomId').value.trim();
-                    const docRef = doc(db, "check", packageId);
+                    const docRef = doc(db, "WeddingPackages", packageId);
                     const docSnap = await getDoc(docRef);
 
                     if (docSnap.exists()) {
@@ -281,7 +279,7 @@
                     }
 
                     const packageData = {
-                        documentsStatus: "لم تقم بالرفع بعد",
+                        documentsStatus: "قيد المراجعة",
                         createdAt: new Date().toISOString()
                     };
 
@@ -295,7 +293,6 @@
 
                     await setDoc(docRef, packageData);
 
-                    // تخزين البيانات في LocalStorage للانتقال لصفحة المتابعة
                     localStorage.setItem('userName', fullName);
                     localStorage.setItem('userRole', role);
                     localStorage.setItem('userId', packageId);
@@ -306,7 +303,7 @@
 
                 } else {
                     const packageId = document.getElementById('partnerId').value.trim();
-                    const docRef = doc(db, "check", packageId);
+                    const docRef = doc(db, "WeddingPackages", packageId);
                     const docSnap = await getDoc(docRef);
 
                     if (!docSnap.exists()) {
@@ -316,11 +313,11 @@
 
                     const pkgData = docSnap.data();
 
-                    if (role === 'عريس' && pkgData.groom && pkgData.groom.phone && pkgData.groom.phone !== "") {
+                    if (role === 'عريس' && pkgData.groom && pkgData.groom.fullName && pkgData.groom.fullName !== "") {
                         alert("هذه الباقة مسجل فيها عريس بالفعل!");
                         return;
                     }
-                    if (role === 'عروسة' && pkgData.bride && pkgData.bride.phone && pkgData.bride.phone !== "") {
+                    if (role === 'عروسة' && pkgData.bride && pkgData.bride.fullName && pkgData.bride.fullName !== "") {
                         alert("هذه الباقة مسجل فيها عروسة بالفعل!");
                         return;
                     }
@@ -334,14 +331,13 @@
 
                     await updateDoc(docRef, updateData);
 
-                    // تخزين البيانات في LocalStorage للانتقال لصفحة المتابعة
                     localStorage.setItem('userName', fullName);
                     localStorage.setItem('userRole', role);
                     localStorage.setItem('userId', packageId);
                     localStorage.setItem('userPhone', phone);
 
                     alert("تم ربط الحسابين بنجاح داخل حزمة الإكليل الموحدة!");
-                    window.location.href = 'home.html';
+                    window.location.href = 'user.html';
                 }
 
             } catch (error) {

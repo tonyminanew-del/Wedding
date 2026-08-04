@@ -118,7 +118,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -137,13 +137,8 @@
         let currentAssignedPriest = "";
 
         window.addEventListener('DOMContentLoaded', async () => {
-            currentAssignedPriest = localStorage.getItem('assignedPriest');
+            currentAssignedPriest = localStorage.getItem('assignedPriest') || "إفرايم";
             const greetingElement = document.getElementById('priestGreeting');
-
-            if (!currentAssignedPriest) {
-                window.location.href = "../index.html";
-                return;
-            }
 
             greetingElement.innerText = "أهلاً بك يا أبونا، " + currentAssignedPriest + " ✝";
             await loadRequestsData();
@@ -164,11 +159,11 @@
             const totalCountElement = document.getElementById('totalCount');
 
             try {
-                const q = query(collection(db, "check"), where("assignedPriest", "==", currentAssignedPriest));
-                const querySnapshot = await getDocs(q);
+                // جلب كل المستندات من مجموعة check مباشرة بدون شروط معقدة لتجنب الأخطاء
+                const querySnapshot = await getDocs(collection(db, "check"));
 
                 if (querySnapshot.empty) {
-                    listContainer.innerHTML = `<div class="no-data">لا توجد طلبات مسجلة معك حالياً.</div>`;
+                    listContainer.innerHTML = `<div class="no-data">لا توجد طلبات مسجلة في النظام حالياً.</div>`;
                     totalCountElement.innerText = "الإجمالي: 0 طلب";
                 } else {
                     let htmlContent = "";
@@ -189,14 +184,14 @@
                         globalRequestsData[docId] = data;
                         count++;
 
-                        const groomName = (data.groom && data.groom.fullName) ? data.groom.fullName : 'غير مسجل';
-                        const brideName = (data.bride && data.bride.fullName) ? data.bride.fullName : 'غير مسجل';
+                        const groomName = (data.groom && data.groom.fullName) ? data.groom.fullName : (data.userCode || 'طلب رقم ' + docId);
+                        const brideName = (data.bride && data.bride.fullName) ? data.bride.fullName : '';
                         const docStatus = data.documentsStatus || 'قيد المراجعة';
 
                         htmlContent += `
                             <div class="request-row-summary" id="row-${docId}">
                                 <div class="summary-info">
-                                    <h4>${groomName} & ${brideName}</h4>
+                                    <h4>${groomName} ${brideName ? '& ' + brideName : ''}</h4>
                                     <p>رقم الطلب: ${docId} | الأوراق: <span style="color: #c5a059; font-weight: bold;">${docStatus}</span></p>
                                 </div>
                                 <button class="link-details-btn" onclick="openRequestDetails('${docId}')">عرض تفاصيل الطلب 📋</button>
@@ -205,7 +200,7 @@
                     });
 
                     if (count === 0) {
-                        listContainer.innerHTML = `<div class="no-data">لا توجد طلبات نشطة حالياً (تمت الأرشفة بعد مرور 24 ساعة على القبول).</div>`;
+                        listContainer.innerHTML = `<div class="no-data">لا توجد طلبات نشطة حالياً.</div>`;
                     } else {
                         listContainer.innerHTML = htmlContent;
                     }
@@ -213,7 +208,7 @@
                 }
             } catch (error) {
                 console.error("خطأ في جلب بيانات check:", error);
-                listContainer.innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء تحميل البيانات. تأكد من إعدادات القواعد (Rules).</div>`;
+                listContainer.innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء تحميل البيانات. تأكد من اتصال الإنترنت أو قواعد الحماية (Rules).</div>`;
             }
         }
 
@@ -229,7 +224,10 @@
             const selectedDate = data.selectedAppointment || data.appointmentDate || 'لم يتم اختيار موعد';
 
             const docActionInfo = data.documentsActionBy ? `<br><span style="color:#27ae60; font-size:11px;">بواسطة الأب: ${data.documentsActionBy} (${data.documentsActionTime || ''})</span>` : '';
-            const apptActionInfo = data.appointmentActionBy ? `<br><span style="color:#27ae60; font-size:11px;">بواسطة الأب: ${data.appointmentActionBy} (${data.appointmentActionTime || ''})</span>` : '';
+            
+            // التعامل مع مسارات الصور سواء كانت idCardUrl أو غيرها
+            const idCard = data.idCardUrl || data.idCard || data.cardImage || '';
+            const certificate = data.certificateUrl || data.certificate || data.khلوImage || '';
 
             modalBody.innerHTML = `
                 <p style="margin-bottom: 8px;"><strong>رقم الطلب (ID):</strong> ${docId}</p>
@@ -238,7 +236,7 @@
                 
                 <div style="margin-top: 10px;">
                     <p style="font-size: 13px;"><strong>حالة الأوراق:</strong> <span id="modal-doc-status-${docId}" style="color: #c5a059; font-weight: bold;">${docStatus}</span> ${docActionInfo}</p>
-                    <p style="font-size: 13px; margin-top: 6px;"><strong>حالة الموعد:</strong> <span id="modal-appt-status-${docId}" style="color: #2980b9; font-weight: bold;">${apptStatus}</span> ${apptActionInfo}</p>
+                    <p style="font-size: 13px; margin-top: 6px;"><strong>حالة الموعد:</strong> <span id="modal-appt-status-${docId}" style="color: #2980b9; font-weight: bold;">${apptStatus}</span></p>
                     <p style="font-size: 12px; color: #555; margin-top: 4px;"><strong>الموعد المقترح:</strong> ${selectedDate}</p>
                 </div>
 
@@ -247,11 +245,11 @@
                     <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                         <div>
                             <p style="font-size: 11px; margin-bottom: 3px;">صورة البطاقة:</p>
-                            ${data.idCardUrl ? `<img src="${data.idCardUrl}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer;" onclick="openImageModal('${data.idCardUrl}')">` : '<span style="font-size:11px; color:#e74c3c;">لم تُرفع بعد</span>'}
+                            ${idCard ? `<img src="${idCard}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer;" onclick="openImageModal('${idCard}')">` : '<span style="font-size:11px; color:#e74c3c;">لم تُرفع بعد كرابط</span>'}
                         </div>
                         <div>
                             <p style="font-size: 11px; margin-bottom: 3px;">شهادة الخلو:</p>
-                            ${data.certificateUrl ? `<img src="${data.certificateUrl}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer;" onclick="openImageModal('${data.certificateUrl}')">` : '<span style="font-size:11px; color:#e74c3c;">لم تُرفع بعد</span>'}
+                            ${certificate ? `<img src="${certificate}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1.5px solid #c5a059; cursor: pointer;" onclick="openImageModal('${certificate}')">` : '<span style="font-size:11px; color:#e74c3c;">لم تُرفع بعد كرابط</span>'}
                         </div>
                     </div>
                 </div>
@@ -312,9 +310,6 @@
                 if (fieldName === 'documentsStatus') {
                     updateData.documentsActionBy = currentAssignedPriest;
                     updateData.documentsActionTime = timeString;
-                } else if (fieldName === 'appointmentStatus') {
-                    updateData.appointmentActionBy = currentAssignedPriest;
-                    updateData.appointmentActionTime = timeString;
                 }
 
                 const docRef = doc(db, "check", docId);

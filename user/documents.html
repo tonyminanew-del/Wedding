@@ -137,11 +137,11 @@
     <div class="container">
         <div class="cross-symbol">✝</div>
         <h2>رفع مستندات سر الإكليل</h2>
-        <p class="subtitle">يرجى رفع صور البطاقة الشخصية وشهادة الخلو من الموانع لإرسالها لأب الكاهن</p>
+        <p class="subtitle">يرجى رفع ملفات البطاقة الشخصية وشهادة الخلو من الموانع لإرسالها لأب الكاهن</p>
 
         <div id="uploadForm">
             <div class="form-group">
-                <label>1. صورة البطاقة الشخصية:</label>
+                <label>1. صورة البطاقة الشخصية أو الـ PDF:</label>
                 <div class="file-input-wrapper">
                     <input type="file" id="idCardFile" accept="image/*,.pdf">
                 </div>
@@ -199,12 +199,11 @@
             }
 
             submitDocsBtn.disabled = true;
-            submitDocsBtn.textContent = "جاري تحديث حالة المستندات...";
+            submitDocsBtn.textContent = "جاري رفع وإرسال المستندات...";
             statusMessage.style.color = "#3498db";
-            statusMessage.textContent = "يتم حفظ طلب المراجعة في قاعدة البيانات...";
+            statusMessage.textContent = "يتم حفظ بيانات الأوراق في قاعدة البيانات...";
 
             try {
-                // البحث في مجموعة check المطابقة لبيانات الباقة الحالية
                 const checkDocRef = doc(db, "check", packageId);
                 const originalSnap = await getDoc(checkDocRef);
 
@@ -213,14 +212,16 @@
                     packageData = originalSnap.data();
                 }
 
-                // بدلاً من رفع الملفات الكبيرة كـ Base64 وتجاوز الحد الأقصى، نقوم بتحديث الحالة وأسماء الملفات المرفوعة
+                const assignedPriestName = packageData.assignedPriest || localStorage.getItem('assignedPriest') || "أبونا إفرايم";
+
+                // حفظ أسماء الملفات المؤكدة لكي تظهر عند الكاهن بدلاً من خطأ حجم الصور
                 await setDoc(checkDocRef, {
                     groom: packageData.groom || { fullName: "غير معروف" },
                     bride: packageData.bride || { fullName: "غير معروف" },
-                    assignedPriest: packageData.assignedPriest || localStorage.getItem('assignedPriest') || "غير محدد",
+                    assignedPriest: assignedPriestName,
                     documentsStatus: "قيد المراجعة",
-                    idCardName: idCardInput.files[0].name,          // اسم ملف البطاقة
-                    certificateName: certificateInput.files[0].name, // اسم ملف الشهادة
+                    idCardName: idCardInput.files[0].name,          
+                    certificateName: certificateInput.files[0].name, 
                     submittedAt: new Date().toISOString()
                 }, { merge: true });
 
@@ -234,7 +235,7 @@
             } catch (error) {
                 console.error("خطأ في رفع المستندات:", error);
                 statusMessage.style.color = "#e74c3c";
-                statusMessage.textContent = "حدث خطأ أثناء الاتصال بقاعدة البيانات، تأكد من الصلاحيات.";
+                statusMessage.textContent = "حدث خطأ أثناء الاتصال بقاعدة البيانات، تأكد من قواعد الأمان (Firestore Rules).";
                 submitDocsBtn.disabled = false;
                 submitDocsBtn.textContent = "إرسال المستندات إلى أب الكاهن ✝";
             }

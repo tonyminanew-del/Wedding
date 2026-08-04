@@ -160,6 +160,7 @@
             text-decoration: none;
             font-size: 13px;
             transition: color 0.3s;
+            cursor: pointer;
         }
 
         .logout-link:hover {
@@ -179,12 +180,23 @@
         </div>
 
         <div id="actionsContainer">
-            <a href="documents" class="action-btn">رفع المستندات والأوراق المطلوبة</a>
+            <a href="documents.html" class="action-btn">رفع المستندات والأوراق المطلوبة</a>
             <div id="calendarButtonWrapper"></div>
         </div>
 
-        <a href="index.html" class="logout-link">تسجيل الخروج</a>
+        <a href="#" onclick="handleLogout(event)" class="logout-link">تسجيل الخروج</a>
     </div>
+
+    <script>
+        // دالة مسؤولة عن تسجيل الخروج ومسح التخزين المؤقت
+        function handleLogout(event) {
+            event.preventDefault();
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userName');
+            window.location.href = 'index.html';
+        }
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -209,6 +221,8 @@
             const myStoredName = localStorage.getItem('userName') || '';
             const dataCard = document.getElementById('dataCard');
             const calendarButtonWrapper = document.getElementById('calendarButtonWrapper');
+
+            console.log("Current Package ID from localStorage:", packageId);
 
             if (!packageId) {
                 dataCard.innerHTML = '<p class="no-data">لا توجد بيانات مسجلة حالياً، يرجى التسجيل أولاً.</p>';
@@ -281,7 +295,6 @@
                         <p>حالة المستندات: <strong style="color: ${docStatusColor};">${docStatus}</strong></p>
                     `;
 
-                    // إذا قام الكنيسة/الأب بالقبول (مقبولة)، يتم إظهار زر الذهاب لصفحة موعد الفرح مباشرة
                     if (docStatus === "مقبولة") {
                         calendarButtonWrapper.innerHTML = `
                             <a href="wedding-date.html" class="action-btn btn-gold">الانتقال إلى صفحة موعد الفرح 🗓️</a>

@@ -3,200 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الصفحة الرئيسية - حجز سر الإكليل</title>
+    <title>لوحة متابعة سر الإكليل</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #f4f6f9 0%, #e4e9f0 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #2c3e50;
-            padding: 20px;
-        }
-
-        .container {
-            background: #ffffff;
-            padding: 40px 30px;
-            border-radius: 22px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
-            text-align: center;
-            width: 100%;
-            max-width: 520px;
-            border-top: 5px solid #c5a059;
-        }
-
-        .cross-symbol {
-            font-size: 34px;
-            color: #c5a059;
-            margin-bottom: 12px;
-            background: #fdfcf7;
-            width: 65px;
-            height: 65px;
-            line-height: 65px;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.15);
-        }
-
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 5px;
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .welcome-text {
-            color: #7f8c8d;
-            margin-bottom: 25px;
-            font-size: 13px;
-        }
-
-        .card {
-            background: #fafbfc;
-            border: 1.5px solid #e9ecef;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: right;
-        }
-
-        .card h3 {
-            font-size: 16px;
-            color: #c5a059;
-            margin-bottom: 12px;
-            border-bottom: 1px solid #e9ecef;
-            padding-bottom: 8px;
-        }
-
-        .card p {
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #2c3e50;
-        }
-
-        .card p span {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status-waiting {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .status-linked {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .no-data {
-            color: #e74c3c;
-            font-weight: bold;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .action-btn {
-            width: 100%;
-            padding: 13px;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background-color: #2c3e50;
-            color: white;
-            margin-top: 10px;
-            text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.15);
-        }
-
-        .action-btn:hover {
-            background-color: #1a252f;
-            transform: translateY(-1px);
-        }
-
-        .btn-gold {
-            background-color: #c5a059 !important;
-        }
-
-        .btn-gold:hover {
-            background-color: #b08d48 !important;
-        }
-
-        .locked-notice {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            margin-top: 10px;
-            text-align: center;
-            border: 1px solid #ffeeba;
-        }
-
-        .logout-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #95a5a6;
-            text-decoration: none;
-            font-size: 13px;
-            transition: color 0.3s;
-            cursor: pointer;
-        }
-
-        .logout-link:hover {
-            color: #e74c3c;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh; color: #2c3e50; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .card { background: #ffffff; width: 100%; max-width: 500px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: right; border-top: 5px solid #c5a059; }
+        .header-icon { text-align: center; font-size: 32px; color: #c5a059; margin-bottom: 10px; }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 5px; font-size: 22px; }
+        p.subtitle { text-align: center; color: #7f8c8d; font-size: 13px; margin-bottom: 25px; }
+        .info-box { background: #fdfcf7; border: 1.5px solid #e9ecef; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 14px; line-height: 1.8; }
+        .info-box strong { color: #c5a059; }
+        .action-btn { display: block; width: 100%; background-color: #2c3e50; color: white; border: none; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; transition: background 0.3s; margin-top: 15px; }
+        .action-btn:hover { background-color: #1a252f; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #eef2f7; color: #2980b9; }
+        .logout-btn { display: block; text-align: center; margin-top: 20px; color: #e74c3c; text-decoration: none; font-size: 13px; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="cross-symbol">✝</div>
+    <div class="card">
+        <div class="header-icon">✝</div>
         <h2>لوحة متابعة سر الإكليل</h2>
-        <p class="welcome-text">متابعة تفاصيل الباقة وحالة المستندات ومواعيد الفرح</p>
+        <p class="subtitle">متابعة تفاصيل الباقة وحالة المستندات ومواعيد الفرح</p>
 
-        <div class="card" id="dataCard">
-            <p>جاري تحميل بيانات الباقة من الكنيسة...</p>
+        <div class="info-box" id="userInfoBox">
+            <p><strong>معرف الحزمة (ID):</strong> <span id="displayId">جاري التحميل...</span></p>
+            <p><strong>اسم العريس:</strong> <span id="displayGroom">جاري التحميل...</span></p>
+            <p><strong>اسم العروسة:</strong> <span id="displayBride">جاري التحميل...</span></p>
+            <p><strong>رقم الهاتف:</strong> <span id="displayPhone">جاري التحميل...</span></p>
+            <p><strong>حالة المستندات:</strong> <span class="status-badge" id="displayDocStatus">قيد المراجعة</span></p>
         </div>
 
-        <div id="actionsContainer">
-            <a href="documents.html" class="action-btn">رفع المستندات والأوراق المطلوبة</a>
-            <div id="calendarButtonWrapper"></div>
-        </div>
-
-        <a href="#" onclick="handleLogout(event)" class="logout-link">تسجيل الخروج</a>
+        <a href="upload.html" class="action-btn">رفع المستندات والأوراق المطلوبة 📄</a>
+        <a href="../index.html" class="logout-btn">تسجيل الخروج ⟵</a>
     </div>
-
-    <script>
-        function handleLogout(event) {
-            event.preventDefault();
-            localStorage.removeItem('userId');
-            localStorage.removeItem('userRole');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userPhone');
-            window.location.href = 'index.html';
-        }
-    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -216,113 +56,52 @@
         const db = getFirestore(app);
 
         window.addEventListener('DOMContentLoaded', async () => {
-            const packageId = localStorage.getItem('userId');
-            const myRole = localStorage.getItem('userRole'); 
-            const myStoredName = localStorage.getItem('userName') || '';
-            const dataCard = document.getElementById('dataCard');
-            const calendarButtonWrapper = document.getElementById('calendarButtonWrapper');
+            // جلب معرف المستند المخزن أثناء تسجيل الدخول أو التسجيل
+            const userCode = localStorage.getItem('userCode') || localStorage.getItem('docId');
 
-            console.log("Current Package ID from localStorage:", packageId);
-
-            if (!packageId) {
-                dataCard.innerHTML = '<p class="no-data">لا توجد بيانات مسجلة حالياً، يرجى التسجيل أو تسجيل الدخول أولاً.</p>';
-                calendarButtonWrapper.innerHTML = '';
+            if (!userCode) {
+                alert("يرجى تسجيل الدخول أولاً.");
+                window.location.href = "../index.html";
                 return;
             }
 
+            document.getElementById('displayId').innerText = userCode;
+
             try {
-                const docRef = doc(db, "check", packageId);
+                // البحث في مجموعة check أو ChurchUsers بناءً على الـ ID
+                const docRef = doc(db, "check", userCode);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    const pkg = docSnap.data();
+                    const data = docSnap.data();
                     
-                    const groomName = pkg.groom && pkg.groom.fullName ? pkg.groom.fullName : "غير مسجل";
-                    const groomPhone = pkg.groom && pkg.groom.phone ? pkg.groom.phone : "غير متوفر";
-                    
-                    const brideName = pkg.bride && pkg.bride.fullName ? pkg.bride.fullName : "غير مسجل";
-                    const bridePhone = pkg.bride && pkg.bride.phone ? pkg.bride.phone : "غير متوفر";
+                    // جلب البيانات مع دعم الاحتمالات المختلفة لتسمية الحقول
+                    const groomName = (data.groom && data.groom.fullName) ? data.groom.fullName : (data.fullName || 'غير مسجل');
+                    const brideName = (data.bride && data.bride.fullName) ? data.bride.fullName : (data.brideName || 'غير مسجل');
+                    const phoneNum = data.phone || (data.groom && data.groom.phone) || 'غير متوفر';
+                    const docStatus = data.documentsStatus || 'قيد المراجعة';
 
-                    const isGroomRegistered = pkg.groom && pkg.groom.fullName && pkg.groom.fullName.trim() !== "";
-                    const isBrideRegistered = pkg.bride && pkg.bride.fullName && pkg.bride.fullName.trim() !== "";
-                    
-                    let isLinked = isGroomRegistered && isBrideRegistered;
-                    
-                    let currentUserName = "";
-                    let partnerTitle = "";
-                    let partnerName = "";
-                    let partnerPhone = "";
-
-                    if (myRole === 'عريس') {
-                        currentUserName = groomName !== "غير مسجل" ? groomName : myStoredName;
-                        partnerTitle = "العروسة";
-                        partnerName = brideName;
-                        partnerPhone = bridePhone;
-                    } else {
-                        currentUserName = brideName !== "غير مسجل" ? brideName : myStoredName;
-                        partnerTitle = "العريس";
-                        partnerName = groomName;
-                        partnerPhone = groomPhone;
-                    }
-
-                    let linkStatusHTML = "";
-                    if (isLinked) {
-                        linkStatusHTML = `
-                            <span class="status-badge status-linked">مترابط ومتصل بنجاح ✝</span>
-                            <p style="margin-top: 10px;">أنت <span>${currentUserName}</span> مرتبط مع (${partnerTitle}): <span>${partnerName}</span></p>
-                            <p>رقم هاتف الشريك: <span>${partnerPhone}</span></p>
-                        `;
-                    } else {
-                        linkStatusHTML = `
-                            <span class="status-badge status-waiting">بانتظار ربط الطرف الآخر ⏳</span>
-                            <p style="margin-top: 10px; color: #e67e22;">أنت <span>${currentUserName}</span>، ولم يتم اكتمال تسجيل الطرف الآخر بعد في هذه الباقة.</p>
-                        `;
-                    }
-
-                    const docStatus = pkg.documentsStatus || "لم تقم بالرفع بعد"; 
-                    let docStatusColor = "#7f8c8d";
-                    if (docStatus === "قيد المراجعة") docStatusColor = "#d35400";
-                    else if (docStatus === "مقبولة") docStatusColor = "#27ae60";
-                    else if (docStatus === "مرفوضة") docStatusColor = "#c0392b";
-
-                    dataCard.innerHTML = `
-                        <h3>معرف الحزمة (ID): ${packageId}</h3>
-                        <p>اسمك: <span>${currentUserName}</span></p>
-                        <p>الصفة: <span>${myRole}</span></p>
-                        <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 12px 0;">
-                        ${linkStatusHTML}
-                        <hr style="border: 0; border-top: 1px solid #e9ecef; margin: 12px 0;">
-                        <p>حالة المستندات: <strong style="color: ${docStatusColor};">${docStatus}</strong></p>
-                    `;
-
-                    if (docStatus === "مقبولة") {
-                        calendarButtonWrapper.innerHTML = `
-                            <a href="wedding-date.html" class="action-btn btn-gold">الانتقال إلى صفحة موعد الفرح 🗓️</a>
-                        `;
-                    } else if (docStatus === "قيد المراجعة") {
-                        calendarButtonWrapper.innerHTML = `
-                            <div class="locked-notice">
-                                ⏳ تم رفع المستندات وهي <strong>قيد المراجعة</strong> من قبل الكنيسة.<br>سيتم فتح صفحة موعد الفرح فور قبول الأوراق.
-                            </div>
-                        `;
-                    } else {
-                        calendarButtonWrapper.innerHTML = `
-                            <div class="locked-notice">
-                                🔒 يرجى رفع المستندات والأوراق المطلوبة أولاً ومتابعة حالتها حتى يتم قبولها لفتح صفحة موعد الفرح.
-                            </div>
-                        `;
-                    }
-
+                    document.getElementById('displayGroom').innerText = groomName;
+                    document.getElementById('displayBride').innerText = brideName;
+                    document.getElementById('displayPhone').innerText = phoneNum;
+                    document.getElementById('displayDocStatus').innerText = docStatus;
                 } else {
-                    dataCard.innerHTML = '<p class="no-data">لم يتم العثور على بيانات هذه الباقة في قاعدة البيانات.</p>';
-                    calendarButtonWrapper.innerHTML = '';
+                    // محاولة البحث في مجموعة ChurchUsers إذا لم توجد في check
+                    const altDocRef = doc(db, "ChurchUsers", userCode);
+                    const altSnap = await getDoc(altDocRef);
+                    if (altSnap.exists()) {
+                        const altData = altSnap.data();
+                        document.getElementById('displayGroom').innerText = altData.fullName || 'غير مسجل';
+                        document.getElementById('displayPhone').innerText = altData.phone || 'غير متوفر';
+                        document.getElementById('displayBride').innerText = altData.brideName || 'غير مسجل';
+                    } else {
+                        document.getElementById('userInfoBox').innerHTML = `<p style="color: #e74c3c; text-align: center;">لم يتم العثور على بيانات لهذا الحساب في قاعدة البيانات.</p>`;
+                    }
                 }
             } catch (error) {
-                console.error("خطأ في جلب بيانات الباقة:", error);
-                dataCard.innerHTML = '<p class="no-data">حدث خطأ أثناء تحميل البيانات، تأكد من تعديل قواعد Firestore Rules.</p>';
+                console.error("خطأ في جلب بيانات المستخدم:", error);
             }
         });
     </script>
-
 </body>
 </html>

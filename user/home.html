@@ -28,7 +28,7 @@
         <p class="subtitle">متابعة تفاصيل الباقة وحالة المستندات ومواعيد الفرح</p>
 
         <div class="info-box" id="userInfoBox">
-            <p><strong>معرف الحزمة (ID):</strong> <span id="displayId">جاري التحميل...</span></p>
+            <p><strong>رقم الطلب (ID):</strong> <span id="displayId">جاري التحميل...</span></p>
             <p><strong>اسم العريس:</strong> <span id="displayGroom">جاري التحميل...</span></p>
             <p><strong>اسم العروسة:</strong> <span id="displayBride">جاري التحميل...</span></p>
             <p><strong>رقم الهاتف:</strong> <span id="displayPhone">جاري التحميل...</span></p>
@@ -58,19 +58,14 @@
         const db = getFirestore(app);
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // جلب المعرف المتاح في التخزين المحلي أو استخدام المعرف "123" الموجود في الصورة افتراضياً
-            let userCode = localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId');
-            
-            if (!userCode) {
-                userCode = "123"; 
-                localStorage.setItem('userId', userCode);
-            }
+            // تثبيت رقم المستند على "123" الموجود في مجموعة check بـ Firebase
+            let userCode = "123"; 
+            localStorage.setItem('userId', userCode);
 
             document.getElementById('displayId').innerText = userCode;
 
             try {
-                // البحث في مجموعة WeddingPackages والمستند بالـ ID الخاص بك
-                const docRef = doc(db, "WeddingPackages", String(userCode));
+                const docRef = doc(db, "check", String(userCode));
                 const docSnap = await getDoc(docRef);
 
                 let groomName = 'غير مسجل';
@@ -82,23 +77,19 @@
                     const data = docSnap.data();
                     console.log("بيانات المستند المسترجعة:", data);
 
-                    // جلب اسم العريس من خريطة groom
                     if (data.groom && data.groom.fullName) {
                         groomName = data.groom.fullName;
                     }
-
-                    // جلب اسم العروسة من خريطة bride
                     if (data.bride && data.bride.fullName) {
                         brideName = data.bride.fullName;
                     }
 
-                    // جلب رقم الهاتف
-                    phoneNum = data.groom?.phone || data.bride?.phone || 'غير متوفر';
+                    phoneNum = data.phone || data.groom?.phone || 'غير متوفر';
                     
-                    // جلب الحالة بدقة من داخل خريطة العريس (حسب ما ظهر في صورتك) أو المستوى العام
-                    docStatus = data.groom?.status || data.documentsStatus || data.status || 'قيد المراجعة';
+                    // جلب الحالة من حقل documentsStatus
+                    docStatus = data.documentsStatus || 'قيد المراجعة';
                 } else {
-                    docStatus = "المستند غير موجود";
+                    docStatus = "الطلب غير موجود";
                 }
 
                 document.getElementById('displayGroom').innerText = groomName;
@@ -110,24 +101,24 @@
                 
                 const cleanStatus = String(docStatus).trim().toLowerCase();
 
-                // فحص ما إذا كانت الحالة تشير إلى القبول (سواء كتبت "مقبول"، "مقبولة"، أو "Accepted")
+                // فحص حالة القبول بدقة
                 const isAccepted = 
                     cleanStatus.includes('قبول') || 
                     cleanStatus.includes('مقبول') || 
+                    cleanStatus.includes('مقبولة') || 
                     cleanStatus.includes('accept') || 
-                    cleanStatus.includes('approved') ||
-                    cleanStatus === "true";
+                    cleanStatus.includes('approved');
 
                 if (isAccepted) {
                     statusBadge.innerText = 'مقبولة ✅';
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';
-                    appointmentBtn.style.display = 'block'; // إظهار زر الانتقال لصفحة clock.html فوراً
+                    appointmentBtn.style.display = 'block'; // يظهر الزر فوراً للانتقال لصفحة التقويم clock.html
                 } else {
                     statusBadge.innerText = docStatus;
                     statusBadge.style.backgroundColor = '#f8d7da';
                     statusBadge.style.color = '#721c24';
-                    appointmentBtn.style.display = 'none'; // إبقاء الزر مخفياً طالما لم يتم القبول
+                    appointmentBtn.style.display = 'none';
                 }
 
             } catch (error) {

@@ -31,7 +31,8 @@
             <p><strong>رقم الطلب (ID):</strong> <span id="displayId">-</span></p>
             <p><strong>اسم العريس:</strong> <span id="displayGroom">لا توجد بيانات</span></p>
             <p><strong>اسم العروسة:</strong> <span id="displayBride">لا توجد بيانات</span></p>
-            <p><strong>رقم الهاتف:</strong> <span id="displayPhone">لا توجد بيانات</span></p>
+            <p><strong>رقم هاتف العريس:</strong> <span id="displayGroomPhone">لا توجد بيانات</span></p>
+            <p><strong>رقم هاتف العروسة:</strong> <span id="displayBridePhone">لا توجد بيانات</span></p>
             <p><strong>حالة المستندات:</strong> <span class="status-badge" id="displayDocStatus">غير متوفر</span></p>
         </div>
 
@@ -42,7 +43,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -61,62 +62,66 @@
             const statusBadge = document.getElementById('displayDocStatus');
             const appointmentBtn = document.getElementById('appointmentBtn');
 
-            try {
-                // جلب جميع المستندات مباشرة من مجموعة "check" في فايبربيس
-                const querySnapshot = await getDocs(collection(db, "check"));
+            // جلب الـ ID الخاص بالعريس أو الباقة المخزن أثناء التسجيل
+            const currentUserId = localStorage.getItem('userId');
 
-                if (querySnapshot.empty) {
-                    document.getElementById('displayId').innerText = "-";
+            if (!currentUserId) {
+                document.getElementById('displayId').innerText = "لا توجد بيانات";
+                document.getElementById('displayGroom').innerText = "لا توجد بيانات";
+                document.getElementById('displayBride').innerText = "لا توجد بيانات";
+                document.getElementById('displayGroomPhone').innerText = "لا توجد بيانات";
+                document.getElementById('displayBridePhone').innerText = "لا توجد بيانات";
+                statusBadge.innerText = 'لا توجد بيانات';
+                statusBadge.style.backgroundColor = '#f8d7da';
+                statusBadge.style.color = '#721c24';
+                appointmentBtn.style.display = 'none';
+                return;
+            }
+
+            try {
+                // البحث بالـ ID الخاص بالعريس/الباقة في مجموعة WeddingPackages
+                const docRef = doc(db, "WeddingPackages", currentUserId);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    document.getElementById('displayId').innerText = "لا توجد بيانات";
                     document.getElementById('displayGroom').innerText = "لا توجد بيانات";
                     document.getElementById('displayBride').innerText = "لا توجد بيانات";
-                    document.getElementById('displayPhone').innerText = "لا توجد بيانات";
-                    statusBadge.innerText = 'لا توجد بيانات في القاعدة';
+                    document.getElementById('displayGroomPhone').innerText = "لا توجد بيانات";
+                    document.getElementById('displayBridePhone').innerText = "لا توجد بيانات";
+                    statusBadge.innerText = 'لا توجد بيانات';
                     statusBadge.style.backgroundColor = '#f8d7da';
                     statusBadge.style.color = '#721c24';
                     appointmentBtn.style.display = 'none';
                     return;
                 }
 
-                // قراءة أول مستند متوفر في القاعدة (مثل مستند "يت ع" الظاهر في قاعدة البيانات لديك)
-                let targetDoc = null;
-                let targetId = "";
+                // إذا وجد الـ ID، جلب وجرض كل البيانات الموجودة بالباقة
+                const data = docSnap.data();
 
-                querySnapshot.forEach((docSnap) => {
-                    if (!targetDoc) {
-                        targetId = docSnap.id;
-                        targetDoc = docSnap.data();
-                    }
-                });
+                document.getElementById('displayId').innerText = data.packageId || currentUserId;
+                document.getElementById('displayGroom').innerText = (data.groom && data.groom.fullName) ? data.groom.fullName : 'لا توجد بيانات';
+                document.getElementById('displayBride').innerText = (data.bride && data.bride.fullName) ? data.bride.fullName : 'لا توجد بيانات';
+                document.getElementById('displayGroomPhone').innerText = (data.groom && data.groom.phone) ? data.groom.phone : 'لا توجد بيانات';
+                document.getElementById('displayBridePhone').innerText = (data.bride && data.bride.phone) ? data.bride.phone : 'لا توجد بيانات';
 
-                if (targetDoc) {
-                    document.getElementById('displayId').innerText = targetId;
-                    document.getElementById('displayGroom').innerText = targetDoc.groom?.fullName || 'غير مسجل';
-                    document.getElementById('displayBride').innerText = targetDoc.bride?.fullName || 'غير مسجل';
-                    document.getElementById('displayPhone').innerText = targetDoc.phone || targetDoc.groom?.phone || 'غير متوفر';
+                const docStatus = data.documentsStatus || data.status || 'قيد المراجعة';
+                const cleanStatus = String(docStatus).trim().toLowerCase();
 
-                    const docStatus = targetDoc.documentsStatus || 'قيد المراجعة';
-                    const cleanStatus = String(docStatus).trim().toLowerCase();
+                const isAccepted = 
+                    cleanStatus.includes('قبول') || 
+                    cleanStatus.includes('مقبول') || 
+                    cleanStatus.includes('مقبولة') || 
+                    cleanStatus.includes('accept') || 
+                    cleanStatus.includes('approved');
 
-                    const isAccepted = 
-                        cleanStatus.includes('قبول') || 
-                        cleanStatus.includes('مقبول') || 
-                        cleanStatus.includes('مقبولة') || 
-                        cleanStatus.includes('accept') || 
-                        cleanStatus.includes('approved');
-
-                    if (isAccepted) {
-                        statusBadge.innerText = 'مقبولة ✅';
-                        statusBadge.style.backgroundColor = '#d4edda';
-                        statusBadge.style.color = '#155724';
-                        appointmentBtn.style.display = 'block';
-                    } else {
-                        statusBadge.innerText = docStatus;
-                        statusBadge.style.backgroundColor = '#f8d7da';
-                        statusBadge.style.color = '#721c24';
-                        appointmentBtn.style.display = 'none';
-                    }
+                if (isAccepted) {
+                    statusBadge.innerText = 'مقبولة ✅';
+                    statusBadge.style.backgroundColor = '#d4edda';
+                    statusBadge.style.color = '#155724';
+                    appointmentBtn.style.display = 'block';
                 } else {
-                    statusBadge.innerText = 'لا توجد بيانات';
+                    statusBadge.innerText = docStatus;
                     statusBadge.style.backgroundColor = '#f8d7da';
                     statusBadge.style.color = '#721c24';
                     appointmentBtn.style.display = 'none';
@@ -124,7 +129,14 @@
 
             } catch (error) {
                 console.error("خطأ في جلب البيانات:", error);
-                statusBadge.innerText = "خطأ في الاتصال";
+                document.getElementById('displayId').innerText = "لا توجد بيانات";
+                document.getElementById('displayGroom').innerText = "لا توجد بيانات";
+                document.getElementById('displayBride').innerText = "لا توجد بيانات";
+                document.getElementById('displayGroomPhone').innerText = "لا توجد بيانات";
+                document.getElementById('displayBridePhone').innerText = "لا توجد بيانات";
+                statusBadge.innerText = "لا توجد بيانات";
+                statusBadge.style.backgroundColor = '#f8d7da';
+                statusBadge.style.color = '#721c24';
             }
         });
     </script>

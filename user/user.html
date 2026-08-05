@@ -205,6 +205,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+    localStorage.setItem('userCode', كود_المستخدم_المكتوب);
 
         // إظهار أو إخفاء الحقول حسب الاختيار
         document.getElementById('idOption').addEventListener('change', function() {

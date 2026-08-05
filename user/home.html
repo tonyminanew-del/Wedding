@@ -61,28 +61,28 @@
             const statusBadge = document.getElementById('displayDocStatus');
             const appointmentBtn = document.getElementById('appointmentBtn');
 
-            // نقوم بقراءة الكود المطلوب البحث عنه حصرياً من رابط الصفحة (Query Parameter مثل ?id=123)
-            // بهذه الطريقة لن يتم جلب أي شخص عشوائي أبداً إلا إذا تم تحديد الكود في الرابط أو من خلال قاعدة البيانات المباشرة
+            // جلب رقم الطلب المكتوب في الرابط (مثل ?id=123) أو الـ localStorage
             const urlParams = new URLSearchParams(window.location.search);
-            const targetId = urlParams.get('id');
+            let userCode = urlParams.get('id') || localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId');
 
-            if (!targetId) {
+            if (!userCode || userCode.trim() === "") {
                 document.getElementById('displayId').innerText = "-";
                 document.getElementById('displayGroom').innerText = "لا توجد بيانات";
                 document.getElementById('displayBride').innerText = "لا توجد بيانات";
                 document.getElementById('displayPhone').innerText = "لا توجد بيانات";
-                statusBadge.innerText = 'يرجى إدخال رقم الطلب';
+                statusBadge.innerText = 'يرجى تسجيل الدخول أو إدخال رقم الطلب';
                 statusBadge.style.backgroundColor = '#f8d7da';
                 statusBadge.style.color = '#721c24';
                 appointmentBtn.style.display = 'none';
-                return;
+                return; 
             }
 
-            document.getElementById('displayId').innerText = targetId;
+            document.getElementById('displayId').innerText = userCode;
 
             try {
-                // البحث في فايبربيس عن المستند المطابق للـ ID الموجود في الرابط فقط
-                const docRef = doc(db, "check", String(targetId));
+                // البحث في مجموعة "check" داخل فايبربيس عن المستند المطابق
+                const cleanCode = String(userCode).trim();
+                const docRef = doc(db, "check", cleanCode);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -115,11 +115,11 @@
                     }
 
                 } else {
-                    // إذا لم يوجد هذا المستند في قاعدة البيانات
+                    // إذا لم يوجد المستند بهذا الرقم في فايبربيس
                     document.getElementById('displayGroom').innerText = "لا توجد بيانات";
                     document.getElementById('displayBride').innerText = "لا توجد بيانات";
                     document.getElementById('displayPhone').innerText = "لا توجد بيانات";
-                    statusBadge.innerText = 'الطلب غير موجود';
+                    statusBadge.innerText = 'الطلب غير موجود في القاعدة';
                     statusBadge.style.backgroundColor = '#f8d7da';
                     statusBadge.style.color = '#721c24';
                     appointmentBtn.style.display = 'none';

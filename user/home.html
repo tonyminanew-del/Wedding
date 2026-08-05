@@ -58,33 +58,47 @@
         const db = getFirestore(app);
 
         window.addEventListener('DOMContentLoaded', async () => {
-            let userCode = localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId') || "221344";
+            // جلب المعرف المتاح في التخزين المحلي أو استخدام المعرف "123" الموجود في الصورة افتراضياً
+            let userCode = localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId');
+            
+            if (!userCode) {
+                userCode = "123"; 
+                localStorage.setItem('userId', userCode);
+            }
+
             document.getElementById('displayId').innerText = userCode;
 
             try {
-                const docRef = doc(db, "WeddingPackages", userCode);
+                // البحث في مجموعة WeddingPackages والمستند بالـ ID الخاص بك
+                const docRef = doc(db, "WeddingPackages", String(userCode));
                 const docSnap = await getDoc(docRef);
 
-                let groomName = 'توني';
+                let groomName = 'غير مسجل';
                 let brideName = 'غير مسجل';
-                let phoneNum = '01203821967';
+                let phoneNum = 'غير متوفر';
                 let docStatus = 'قيد المراجعة';
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+                    console.log("بيانات المستند المسترجعة:", data);
 
-                    if (data.groom && data.groom.fullName && data.groom.fullName.trim() !== "") {
+                    // جلب اسم العريس من خريطة groom
+                    if (data.groom && data.groom.fullName) {
                         groomName = data.groom.fullName;
                     }
 
-                    if (data.bride && data.bride.fullName && data.bride.fullName.trim() !== "") {
+                    // جلب اسم العروسة من خريطة bride
+                    if (data.bride && data.bride.fullName) {
                         brideName = data.bride.fullName;
                     }
 
-                    phoneNum = data.groom?.phone || data.bride?.phone || '01203821967';
+                    // جلب رقم الهاتف
+                    phoneNum = data.groom?.phone || data.bride?.phone || 'غير متوفر';
                     
-                    // فحص شامل لجميع الاحتمالات التي قد تكون مخزنة في قاعدة البيانات
-                    docStatus = data.documentsStatus || data.status || data.groom?.status || data.bride?.status || 'قيد المراجعة';
+                    // جلب الحالة بدقة من داخل خريطة العريس (حسب ما ظهر في صورتك) أو المستوى العام
+                    docStatus = data.groom?.status || data.documentsStatus || data.status || 'قيد المراجعة';
+                } else {
+                    docStatus = "المستند غير موجود";
                 }
 
                 document.getElementById('displayGroom').innerText = groomName;
@@ -92,24 +106,33 @@
                 document.getElementById('displayPhone').innerText = phoneNum;
 
                 const statusBadge = document.getElementById('displayDocStatus');
+                const appointmentBtn = document.getElementById('appointmentBtn');
                 
-                // تحويل النص لتفادي أي أخطاء في الحروف أو المسافات
                 const cleanStatus = String(docStatus).trim().toLowerCase();
 
-                // إذا وجد الكود أي علامة تدل على القبول، سيحدث الشاشة فوراً
-                if (cleanStatus.includes('قبول') || cleanStatus.includes('مقبول') || cleanStatus.includes('accept') || cleanStatus.includes('true')) {
-                    statusBadge.innerText = 'مقبولة';
+                // فحص ما إذا كانت الحالة تشير إلى القبول (سواء كتبت "مقبول"، "مقبولة"، أو "Accepted")
+                const isAccepted = 
+                    cleanStatus.includes('قبول') || 
+                    cleanStatus.includes('مقبول') || 
+                    cleanStatus.includes('accept') || 
+                    cleanStatus.includes('approved') ||
+                    cleanStatus === "true";
+
+                if (isAccepted) {
+                    statusBadge.innerText = 'مقبولة ✅';
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';
-                    document.getElementById('appointmentBtn').style.display = 'block';
+                    appointmentBtn.style.display = 'block'; // إظهار زر الانتقال لصفحة clock.html فوراً
                 } else {
                     statusBadge.innerText = docStatus;
-                    statusBadge.style.backgroundColor = '#eef2f7';
-                    statusBadge.style.color = '#2980b9';
-                    document.getElementById('appointmentBtn').style.display = 'none';
+                    statusBadge.style.backgroundColor = '#f8d7da';
+                    statusBadge.style.color = '#721c24';
+                    appointmentBtn.style.display = 'none'; // إبقاء الزر مخفياً طالما لم يتم القبول
                 }
+
             } catch (error) {
                 console.error("خطأ في جلب البيانات:", error);
+                document.getElementById('displayDocStatus').innerText = "خطأ في الاتصال";
             }
         });
     </script>

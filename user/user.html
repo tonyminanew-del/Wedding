@@ -191,7 +191,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -205,151 +205,161 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-    localStorage.setItem('userCode', كود_المستخدم_المكتوب);
 
         // إظهار أو إخفاء الحقول حسب الاختيار
-        document.getElementById('idOption').addEventListener('change', function() {
-            const idInputGroup = document.getElementById('idInputGroup');
-            const newIdGroup = document.getElementById('newIdGroup');
-            
-            if (this.value === 'لدي ID من قبل') {
-                idInputGroup.style.display = 'block';
-                newIdGroup.style.display = 'none';
-                document.getElementById('partnerId').setAttribute('required', 'true');
-                document.getElementById('myCustomId').removeAttribute('required');
-            } else {
-                idInputGroup.style.display = 'none';
-                newIdGroup.style.display = 'block';
-                document.getElementById('partnerId').removeAttribute('required');
-                document.getElementById('myCustomId').setAttribute('required', 'true');
-                document.getElementById('partnerInfoBox').style.display = 'none';
-            }
-        });
-
-        // البحث التلقائي وإظهار بيانات الطرف الآخر بمجرد الانتهاء من كتابة الـ ID والضغط خارجه
-        document.getElementById('partnerId').addEventListener('blur', async function() {
-            const packageId = this.value.trim();
-            const infoBox = document.getElementById('partnerInfoBox');
-
-            if (!packageId) return;
-
-            try {
-                const docRef = doc(db, "WeddingPackages", packageId);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    let infoText = "";
-
-                    // التحقق مما إذا كان المسجل المسبق هو عريس أو عروسة لعرضه تلقائياً
-                    if (data.groom && data.groom.phone && data.groom.phone !== "") {
-                        infoText = `الطرف المسجل مسبقاً (العريس): <strong>${data.groom.fullName}</strong>`;
-                    } else if (data.bride && data.bride.phone && data.bride.phone !== "") {
-                        infoText = `الطرف المسجل مسبقاً (العروسة): <strong>${data.bride.fullName}</strong>`;
-                    } else {
-                        infoText = "هذه الباقة فارغة حالياً.";
-                    }
-
-                    infoBox.style.display = 'block';
-                    infoBox.innerHTML = infoText;
+        const idOptionElem = document.getElementById('idOption');
+        if (idOptionElem) {
+            idOptionElem.addEventListener('change', function() {
+                const idInputGroup = document.getElementById('idInputGroup');
+                const newIdGroup = document.getElementById('newIdGroup');
+                
+                if (this.value === 'لدي ID من قبل') {
+                    if (idInputGroup) idInputGroup.style.display = 'block';
+                    if (newIdGroup) newIdGroup.style.display = 'none';
+                    const partnerInput = document.getElementById('partnerId');
+                    const customInput = document.getElementById('myCustomId');
+                    if (partnerInput) partnerInput.setAttribute('required', 'true');
+                    if (customInput) customInput.removeAttribute('required');
                 } else {
-                    infoBox.style.display = 'block';
-                    infoBox.innerHTML = "❌ هذا الـ ID غير موجود بالنظام، تأكد من الرقم.";
+                    if (idInputGroup) idInputGroup.style.display = 'none';
+                    if (newIdGroup) newIdGroup.style.display = 'block';
+                    const partnerInput = document.getElementById('partnerId');
+                    const customInput = document.getElementById('myCustomId');
+                    if (partnerInput) partnerInput.removeAttribute('required');
+                    if (customInput) customInput.setAttribute('required', 'true');
+                    const infoBox = document.getElementById('partnerInfoBox');
+                    if (infoBox) infoBox.style.display = 'none';
                 }
-            } catch (error) {
-                console.error("خطأ في جلب البيانات:", error);
-            }
-        });
+            });
+        }
 
-        const form = document.getElementById('userForm');
+        // البحث التلقائي وإظهار بيانات الطرف الآخر
+        const partnerIdElem = document.getElementById('partnerId');
+        if (partnerIdElem) {
+            partnerIdElem.addEventListener('blur', async function() {
+                const packageId = this.value.trim();
+                const infoBox = document.getElementById('partnerInfoBox');
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+                if (!packageId || !infoBox) return;
 
-            const fullName = document.getElementById('fullName').value.trim();
-            const role = document.getElementById('role').value;
-            const idOption = document.getElementById('idOption').value;
-            const phone = document.getElementById('phone').value.trim();
-
-            try {
-                if (idOption === 'إنشاء ID جديد') {
-                    const packageId = document.getElementById('myCustomId').value.trim();
+                try {
                     const docRef = doc(db, "WeddingPackages", packageId);
                     const docSnap = await getDoc(docRef);
 
                     if (docSnap.exists()) {
-                        alert("هذا الـ ID مستخدم مسبقاً، يرجى اختيار رمز أو رقم آخر.");
-                        return;
-                    }
+                        const data = docSnap.data();
+                        let infoText = "";
 
-                    const packageData = {
-                        packageId: packageId,
-                        status: "قيد المراجعة",
-                        createdAt: new Date()
-                    };
+                        if (data.groom && data.groom.fullName && data.groom.fullName !== "") {
+                            infoText = `الطرف المسجل مسبقاً (العريس): <strong>${data.groom.fullName}</strong>`;
+                        } else if (data.bride && data.bride.fullName && data.bride.fullName !== "") {
+                            infoText = `الطرف المسجل مسبقاً (العروسة): <strong>${data.bride.fullName}</strong>`;
+                        } else {
+                            infoText = "هذه الباقة فارغة حالياً.";
+                        }
 
-                    if (role === 'عريس') {
-                        packageData.groom = { fullName, phone };
-                        packageData.bride = { fullName: "", phone: "" };
+                        infoBox.style.display = 'block';
+                        infoBox.innerHTML = infoText;
                     } else {
-                        packageData.bride = { fullName, phone };
-                        packageData.groom = { fullName: "", phone: "" };
+                        infoBox.style.display = 'block';
+                        infoBox.innerHTML = "❌ هذا الـ ID غير موجود بالنظام، تأكد من الرقم.";
                     }
-
-                    await setDoc(docRef, packageData);
-
-                    localStorage.setItem('userName', fullName);
-                    localStorage.setItem('userRole', role);
-                    localStorage.setItem('userId', packageId);
-                    localStorage.setItem('userPhone', phone);
-
-                    alert(`تم إنشاء الباقة بنجاح!\nالـ ID المشترك للباقة هو: ${packageId}`);
-                    window.location.href = 'home.html';
-
-                } else {
-                    const packageId = document.getElementById('partnerId').value.trim();
-                    const docRef = doc(db, "WeddingPackages", packageId);
-                    const docSnap = await getDoc(docRef);
-
-                    if (!docSnap.exists()) {
-                        alert("خطأ: الـ ID غير موجود بالنظام، تأكد من الرقم الصحيح.");
-                        return;
-                    }
-
-                    const pkgData = docSnap.data();
-
-                    if (role === 'عريس' && pkgData.groom && pkgData.groom.phone !== "") {
-                        alert("هذه الباقة مسجل فيها عريس بالفعل!");
-                        return;
-                    }
-                    if (role === 'عروسة' && pkgData.bride && pkgData.bride.phone !== "") {
-                        alert("هذه الباقة مسجل فيها عروسة بالفعل!");
-                        return;
-                    }
-
-                    const updateData = {};
-                    if (role === 'عريس') {
-                        updateData.groom = { fullName, phone };
-                    } else {
-                        updateData.bride = { fullName, phone };
-                    }
-
-                    await updateDoc(docRef, updateData);
-
-                    localStorage.setItem('userName', fullName);
-                    localStorage.setItem('userRole', role);
-                    localStorage.setItem('userId', packageId);
-                    localStorage.setItem('userPhone', phone);
-
-                    alert("تم ربط الحسابين بنجاح داخل حزمة الإكليل الموحدة!");
-                    window.location.href = 'home.html';
+                } catch (error) {
+                    console.error("خطأ في جلب البيانات:", error);
                 }
+            });
+        }
 
-            } catch (error) {
-                console.error("خطأ في الاتصال بقاعدة البيانات: ", error);
-                alert("حدث خطأ أثناء الحفظ، تأكد من اتصال الإنترنت وصلاحيات قاعدة البيانات.");
-            }
-        });
+        const form = document.getElementById('userForm');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const fullName = document.getElementById('fullName').value.trim();
+                const role = document.getElementById('role').value;
+                const idOption = document.getElementById('idOption').value;
+                const phone = document.getElementById('phone').value.trim();
+
+                try {
+                    if (idOption === 'إنشاء ID جديد') {
+                        const packageId = document.getElementById('myCustomId').value.trim();
+                        const docRef = doc(db, "WeddingPackages", packageId);
+                        const docSnap = await getDoc(docRef);
+
+                        if (docSnap.exists()) {
+                            alert("هذا الـ ID مستخدم مسبقاً، يرجى اختيار رمز أو رقم آخر.");
+                            return;
+                        }
+
+                        const packageData = {
+                            packageId: packageId,
+                            status: "قيد المراجعة",
+                            createdAt: new Date(),
+                            groom: { fullName: "", phone: "" },
+                            bride: { fullName: "", phone: "" }
+                        };
+
+                        if (role === 'عريس') {
+                            packageData.groom = { fullName, phone };
+                        } else {
+                            packageData.bride = { fullName, phone };
+                        }
+
+                        await setDoc(docRef, packageData);
+
+                        localStorage.setItem('userName', fullName);
+                        localStorage.setItem('userRole', role);
+                        localStorage.setItem('userId', packageId);
+                        localStorage.setItem('userPhone', phone);
+
+                        alert(`تم إنشاء الباقة بنجاح!\nالـ ID المشترك للباقة هو: ${packageId}`);
+                        window.location.href = 'home.html';
+
+                    } else {
+                        const packageId = document.getElementById('partnerId').value.trim();
+                        const docRef = doc(db, "WeddingPackages", packageId);
+                        const docSnap = await getDoc(docRef);
+
+                        if (!docSnap.exists()) {
+                            alert("خطأ: الـ ID غير موجود بالنظام، تأكد من الرقم الصحيح.");
+                            return;
+                        }
+
+                        const pkgData = docSnap.data();
+
+                        if (role === 'عريس' && pkgData.groom && pkgData.groom.fullName && pkgData.groom.fullName !== "") {
+                            alert("هذه الباقة مسجل فيها عريس بالفعل!");
+                            return;
+                        }
+                        if (role === 'عروسة' && pkgData.bride && pkgData.bride.fullName && pkgData.bride.fullName !== "") {
+                            alert("هذه الباقة مسجل فيها عروسة بالفعل!");
+                            return;
+                        }
+
+                        const updateData = {};
+                        if (role === 'عريس') {
+                            updateData.groom = { fullName, phone };
+                        } else {
+                            updateData.bride = { fullName, phone };
+                        }
+
+                        await updateDoc(docRef, updateData);
+
+                        localStorage.setItem('userName', fullName);
+                        localStorage.setItem('userRole', role);
+                        localStorage.setItem('userId', packageId);
+                        localStorage.setItem('userPhone', phone);
+
+                        alert("تم ربط الحسابين بنجاح داخل حزمة الإكليل الموحدة!");
+                        window.location.href = 'home.html';
+                    }
+
+                } catch (error) {
+                    console.error("خطأ في الاتصال بقاعدة البيانات: ", error);
+                    alert("حدث خطأ أثناء الحفظ، تأكد من اتصال الإنترنت وصلاحيات قاعدة البيانات.");
+                }
+            });
+        }
     </script>
 
 </body>

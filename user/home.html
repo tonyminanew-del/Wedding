@@ -28,10 +28,10 @@
         <p class="subtitle">متابعة تفاصيل الباقة وحالة المستندات ومواعيد الفرح</p>
 
         <div class="info-box" id="userInfoBox">
-            <p><strong>معرف الحزمة (ID):</strong> <span id="displayId">221344</span></p>
-            <p><strong>اسم العريس:</strong> <span id="displayGroom">توني</span></p>
-            <p><strong>اسم العروسة:</strong> <span id="displayBride">غير مسجل</span></p>
-            <p><strong>رقم الهاتف:</strong> <span id="displayPhone">01203821967</span></p>
+            <p><strong>معرف الحزمة (ID):</strong> <span id="displayId">جاري التحميل...</span></p>
+            <p><strong>اسم العريس:</strong> <span id="displayGroom">جاري التحميل...</span></p>
+            <p><strong>اسم العروسة:</strong> <span id="displayBride">جاري التحميل...</span></p>
+            <p><strong>رقم الهاتف:</strong> <span id="displayPhone">جاري التحميل...</span></p>
             <p><strong>حالة المستندات:</strong> <span class="status-badge" id="displayDocStatus">قيد المراجعة</span></p>
         </div>
 
@@ -65,29 +65,51 @@
                 const docRef = doc(db, "WeddingPackages", userCode);
                 const docSnap = await getDoc(docRef);
 
+                let groomName = 'توني';
+                let brideName = 'غير مسجل';
+                let phoneNum = '01203821967';
+                let docStatus = 'قيد المراجعة';
+
                 if (docSnap.exists()) {
                     const data = docSnap.data();
 
-                    let groomName = (data.groom && data.groom.fullName && data.groom.fullName.trim() !== "") ? data.groom.fullName : 'توني';
-                    let brideName = (data.bride && data.bride.fullName && data.bride.fullName.trim() !== "") ? data.bride.fullName : 'غير مسجل';
-                    let phoneNum = data.groom?.phone || data.bride?.phone || '01203821967';
-                    let docStatus = data.documentsStatus || data.groom?.status || 'قيد المراجعة';
-
-                    document.getElementById('displayGroom').innerText = groomName;
-                    document.getElementById('displayBride').innerText = brideName;
-                    document.getElementById('displayPhone').innerText = phoneNum;
-
-                    const statusBadge = document.getElementById('displayDocStatus');
-                    statusBadge.innerText = docStatus;
-
-                    if (docStatus.trim() === 'مقبولة' || docStatus.includes('قبول')) {
-                        statusBadge.style.backgroundColor = '#d4edda';
-                        statusBadge.style.color = '#155724';
-                        document.getElementById('appointmentBtn').style.display = 'block';
+                    if (data.groom && data.groom.fullName && data.groom.fullName.trim() !== "") {
+                        groomName = data.groom.fullName;
                     }
+
+                    if (data.bride && data.bride.fullName && data.bride.fullName.trim() !== "") {
+                        brideName = data.bride.fullName;
+                    }
+
+                    phoneNum = data.groom?.phone || data.bride?.phone || '01203821967';
+                    
+                    // فحص شامل لجميع الاحتمالات التي قد تكون مخزنة في قاعدة البيانات
+                    docStatus = data.documentsStatus || data.status || data.groom?.status || data.bride?.status || 'قيد المراجعة';
+                }
+
+                document.getElementById('displayGroom').innerText = groomName;
+                document.getElementById('displayBride').innerText = brideName;
+                document.getElementById('displayPhone').innerText = phoneNum;
+
+                const statusBadge = document.getElementById('displayDocStatus');
+                
+                // تحويل النص لتفادي أي أخطاء في الحروف أو المسافات
+                const cleanStatus = String(docStatus).trim().toLowerCase();
+
+                // إذا وجد الكود أي علامة تدل على القبول، سيحدث الشاشة فوراً
+                if (cleanStatus.includes('قبول') || cleanStatus.includes('مقبول') || cleanStatus.includes('accept') || cleanStatus.includes('true')) {
+                    statusBadge.innerText = 'مقبولة';
+                    statusBadge.style.backgroundColor = '#d4edda';
+                    statusBadge.style.color = '#155724';
+                    document.getElementById('appointmentBtn').style.display = 'block';
+                } else {
+                    statusBadge.innerText = docStatus;
+                    statusBadge.style.backgroundColor = '#eef2f7';
+                    statusBadge.style.color = '#2980b9';
+                    document.getElementById('appointmentBtn').style.display = 'none';
                 }
             } catch (error) {
-                console.log("العمل في وضع العرض المباشر نظراً لتقييد المتصفح أو الشبكة.");
+                console.error("خطأ في جلب البيانات:", error);
             }
         });
     </script>

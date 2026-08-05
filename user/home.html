@@ -42,7 +42,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -58,33 +58,46 @@
         const db = getFirestore(app);
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // سحب الـ ID الخاص بالمستخدم المسجل حالياً من الذاكرة المحلية
+            // سحب الـ ID الخاص بالمستخدم الحالي من الذاكرة المحلية
             let userCode = localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId');
             
-            // إذا لم يتم العثور على مستخدم مسجل، ننبهه أو نضع قيمة افتراضية للتجربة
             if (!userCode) {
-                document.getElementById('displayId').innerText = "غير مسجل الدخول";
+                document.getElementById('displayId').innerText = "غير مسجل";
                 document.getElementById('displayGroom').innerText = "يرجى تسجيل الدخول أولاً";
                 document.getElementById('displayBride').innerText = "-";
                 document.getElementById('displayPhone').innerText = "-";
+                document.getElementById('displayDocStatus').innerText = "غير متوفر";
                 return;
             }
 
             document.getElementById('displayId').innerText = userCode;
 
             try {
-                // جلب المستند الخاص بهذا المستخدم فقط من مجموعة "check"
-                const docRef = doc(db, "check", String(userCode));
-                const docSnap = await getDoc(docRef);
+                let docSnap = null;
+                let data = null;
+
+                // 1. محاولة جلب المستند مباشرة برقم الـ ID من مجموعة "check"
+                let docRef = doc(db, "check", String(userCode));
+                docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    data = docSnap.data();
+                } else {
+                    // 2. إذا لم يوجد مباشرة، نبحث في مجموعة "check" عن طريق الحقل المخصص للمستخدم
+                    const q = query(collection(db, "check"), where("userCode", "==", userCode));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (!querySnapshot.empty) {
+                        data = querySnapshot.docs[0].data();
+                    }
+                }
 
                 let groomName = 'غير مسجل';
                 let brideName = 'غير مسجل';
                 let phoneNum = 'غير متوفر';
                 let docStatus = 'قيد المراجعة';
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-
+                if (data) {
                     if (data.groom && data.groom.fullName) {
                         groomName = data.groom.fullName;
                     }
@@ -118,7 +131,7 @@
                     statusBadge.innerText = 'مقبولة ✅';
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';
-                    appointmentBtn.style.display = 'block';
+                    appointmentBtn.style.display = 'block'; // يظهر زر الموعد فوراً
                 } else {
                     statusBadge.innerText = docStatus;
                     statusBadge.style.backgroundColor = '#f8d7da';

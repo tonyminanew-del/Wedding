@@ -42,7 +42,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -61,38 +61,40 @@
             const statusBadge = document.getElementById('displayDocStatus');
             const appointmentBtn = document.getElementById('appointmentBtn');
 
-            // جلب رقم الطلب المكتوب في الرابط (مثل ?id=123) أو الـ localStorage
-            const urlParams = new URLSearchParams(window.location.search);
-            let userCode = urlParams.get('id') || localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId');
-
-            if (!userCode || userCode.trim() === "") {
-                document.getElementById('displayId').innerText = "-";
-                document.getElementById('displayGroom').innerText = "لا توجد بيانات";
-                document.getElementById('displayBride').innerText = "لا توجد بيانات";
-                document.getElementById('displayPhone').innerText = "لا توجد بيانات";
-                statusBadge.innerText = 'يرجى تسجيل الدخول أو إدخال رقم الطلب';
-                statusBadge.style.backgroundColor = '#f8d7da';
-                statusBadge.style.color = '#721c24';
-                appointmentBtn.style.display = 'none';
-                return; 
-            }
-
-            document.getElementById('displayId').innerText = userCode;
-
             try {
-                // البحث في مجموعة "check" داخل فايبربيس عن المستند المطابق
-                const cleanCode = String(userCode).trim();
-                const docRef = doc(db, "check", cleanCode);
-                const docSnap = await getDoc(docRef);
+                // جلب جميع المستندات مباشرة من مجموعة "check" في فايبربيس
+                const querySnapshot = await getDocs(collection(db, "check"));
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
+                if (querySnapshot.empty) {
+                    document.getElementById('displayId').innerText = "-";
+                    document.getElementById('displayGroom').innerText = "لا توجد بيانات";
+                    document.getElementById('displayBride').innerText = "لا توجد بيانات";
+                    document.getElementById('displayPhone').innerText = "لا توجد بيانات";
+                    statusBadge.innerText = 'لا توجد بيانات في القاعدة';
+                    statusBadge.style.backgroundColor = '#f8d7da';
+                    statusBadge.style.color = '#721c24';
+                    appointmentBtn.style.display = 'none';
+                    return;
+                }
 
-                    document.getElementById('displayGroom').innerText = data.groom?.fullName || 'غير مسجل';
-                    document.getElementById('displayBride').innerText = data.bride?.fullName || 'غير مسجل';
-                    document.getElementById('displayPhone').innerText = data.phone || data.groom?.phone || 'غير متوفر';
+                // قراءة أول مستند متوفر في القاعدة (مثل مستند "يت ع" الظاهر في قاعدة البيانات لديك)
+                let targetDoc = null;
+                let targetId = "";
 
-                    const docStatus = data.documentsStatus || 'قيد المراجعة';
+                querySnapshot.forEach((docSnap) => {
+                    if (!targetDoc) {
+                        targetId = docSnap.id;
+                        targetDoc = docSnap.data();
+                    }
+                });
+
+                if (targetDoc) {
+                    document.getElementById('displayId').innerText = targetId;
+                    document.getElementById('displayGroom').innerText = targetDoc.groom?.fullName || 'غير مسجل';
+                    document.getElementById('displayBride').innerText = targetDoc.bride?.fullName || 'غير مسجل';
+                    document.getElementById('displayPhone').innerText = targetDoc.phone || targetDoc.groom?.phone || 'غير متوفر';
+
+                    const docStatus = targetDoc.documentsStatus || 'قيد المراجعة';
                     const cleanStatus = String(docStatus).trim().toLowerCase();
 
                     const isAccepted = 
@@ -113,20 +115,15 @@
                         statusBadge.style.color = '#721c24';
                         appointmentBtn.style.display = 'none';
                     }
-
                 } else {
-                    // إذا لم يوجد المستند بهذا الرقم في فايبربيس
-                    document.getElementById('displayGroom').innerText = "لا توجد بيانات";
-                    document.getElementById('displayBride').innerText = "لا توجد بيانات";
-                    document.getElementById('displayPhone').innerText = "لا توجد بيانات";
-                    statusBadge.innerText = 'الطلب غير موجود في القاعدة';
+                    statusBadge.innerText = 'لا توجد بيانات';
                     statusBadge.style.backgroundColor = '#f8d7da';
                     statusBadge.style.color = '#721c24';
                     appointmentBtn.style.display = 'none';
                 }
 
             } catch (error) {
-                console.error("خطأ في الاتصال بقاعدة البيانات:", error);
+                console.error("خطأ في جلب البيانات:", error);
                 statusBadge.innerText = "خطأ في الاتصال";
             }
         });

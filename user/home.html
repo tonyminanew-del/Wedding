@@ -58,13 +58,22 @@
         const db = getFirestore(app);
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // تثبيت رقم المستند على "123" الموجود في مجموعة check بـ Firebase
-            let userCode = "123"; 
-            localStorage.setItem('userId', userCode);
+            // سحب الـ ID الخاص بالمستخدم المسجل حالياً من الذاكرة المحلية
+            let userCode = localStorage.getItem('userId') || localStorage.getItem('userCode') || localStorage.getItem('docId');
+            
+            // إذا لم يتم العثور على مستخدم مسجل، ننبهه أو نضع قيمة افتراضية للتجربة
+            if (!userCode) {
+                document.getElementById('displayId').innerText = "غير مسجل الدخول";
+                document.getElementById('displayGroom').innerText = "يرجى تسجيل الدخول أولاً";
+                document.getElementById('displayBride').innerText = "-";
+                document.getElementById('displayPhone').innerText = "-";
+                return;
+            }
 
             document.getElementById('displayId').innerText = userCode;
 
             try {
+                // جلب المستند الخاص بهذا المستخدم فقط من مجموعة "check"
                 const docRef = doc(db, "check", String(userCode));
                 const docSnap = await getDoc(docRef);
 
@@ -75,7 +84,6 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    console.log("بيانات المستند المسترجعة:", data);
 
                     if (data.groom && data.groom.fullName) {
                         groomName = data.groom.fullName;
@@ -85,8 +93,6 @@
                     }
 
                     phoneNum = data.phone || data.groom?.phone || 'غير متوفر';
-                    
-                    // جلب الحالة من حقل documentsStatus
                     docStatus = data.documentsStatus || 'قيد المراجعة';
                 } else {
                     docStatus = "الطلب غير موجود";
@@ -101,7 +107,6 @@
                 
                 const cleanStatus = String(docStatus).trim().toLowerCase();
 
-                // فحص حالة القبول بدقة
                 const isAccepted = 
                     cleanStatus.includes('قبول') || 
                     cleanStatus.includes('مقبول') || 
@@ -113,7 +118,7 @@
                     statusBadge.innerText = 'مقبولة ✅';
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';
-                    appointmentBtn.style.display = 'block'; // يظهر الزر فوراً للانتقال لصفحة التقويم clock.html
+                    appointmentBtn.style.display = 'block';
                 } else {
                     statusBadge.innerText = docStatus;
                     statusBadge.style.backgroundColor = '#f8d7da';

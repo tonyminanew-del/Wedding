@@ -88,11 +88,10 @@
                 document.getElementById('displayGroomPhone').innerText = (data.groom && data.groom.phone) ? data.groom.phone : 'لا توجد بيانات';
                 document.getElementById('displayBridePhone').innerText = (data.bride && data.bride.phone) ? data.bride.phone : 'لا توجد بيانات';
 
-                // فحص كافة احتمالات أسماء حقول الحالة في قاعدة البيانات (سواء عربي أو إنجليزي)
-                const rawStatus = data.status || data.documentsStatus || data.PapersStatus || data.approval || data.state || 'قيد المراجعة';
+                // فحص جميع الاحتمالات الممكنة لحقل الحالة في قاعدة البيانات
+                const rawStatus = data.DocumentsStatus || data.documentsStatus || data.status || data.PapersStatus || data.approval || 'قيد المراجعة';
                 const cleanStatus = String(rawStatus).trim().toLowerCase();
 
-                // شروط واسعة جداً لاكتشاف القبول باللغتين العربية والإنجليزية
                 const isAccepted = 
                     cleanStatus.includes('قبول') || 
                     cleanStatus.includes('مقبول') || 
@@ -107,7 +106,7 @@
                     statusBadge.innerText = 'مقبولة ✅';
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';
-                    appointmentBtn.style.display = 'block'; // ظهور زر الموعد والانتقال لصفحة clock.html
+                    appointmentBtn.style.display = 'block'; 
                 } else {
                     statusBadge.innerText = rawStatus;
                     statusBadge.style.backgroundColor = '#f8d7da';

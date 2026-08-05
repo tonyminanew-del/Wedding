@@ -284,6 +284,7 @@
                     if (idOption === 'إنشاء ID جديد') {
                         const packageId = document.getElementById('myCustomId').value.trim();
                         const docRef = doc(db, "WeddingPackages", packageId);
+                        const checkRef = doc(db, "check", packageId);
                         const docSnap = await getDoc(docRef);
 
                         if (docSnap.exists()) {
@@ -294,6 +295,7 @@
                         const packageData = {
                             packageId: packageId,
                             status: "قيد المراجعة",
+                            documentsStatus: "قيد المراجعة",
                             createdAt: new Date(),
                             groom: { fullName: "", phone: "" },
                             bride: { fullName: "", phone: "" }
@@ -305,7 +307,9 @@
                             packageData.bride = { fullName, phone };
                         }
 
+                        // حفظ في المجموعتين معاً
                         await setDoc(docRef, packageData);
+                        await setDoc(checkRef, packageData, { merge: true });
 
                         localStorage.setItem('userName', fullName);
                         localStorage.setItem('userRole', role);
@@ -318,6 +322,7 @@
                     } else {
                         const packageId = document.getElementById('partnerId').value.trim();
                         const docRef = doc(db, "WeddingPackages", packageId);
+                        const checkRef = doc(db, "check", packageId);
                         const docSnap = await getDoc(docRef);
 
                         if (!docSnap.exists()) {
@@ -327,23 +332,21 @@
 
                         const pkgData = docSnap.data();
 
-                        if (role === 'عريس' && pkgData.groom && pkgData.groom.fullName && pkgData.groom.fullName !== "") {
-                            alert("هذه الباقة مسجل فيها عريس بالفعل!");
-                            return;
-                        }
-                        if (role === 'عروسة' && pkgData.bride && pkgData.bride.fullName && pkgData.bride.fullName !== "") {
-                            alert("هذه الباقة مسجل فيها عروسة بالفعل!");
-                            return;
-                        }
-
                         const updateData = {};
                         if (role === 'عريس') {
+                            if (pkgData.groom && pkgData.groom.fullName && pkgData.groom.fullName !== "") {
+                                alert("هذه الباقة مسجل فيها عريس بالفعل!");
+                                return;
+                            }
                             updateData.groom = { fullName, phone };
                         } else {
+                            // تمكين تسجيل العروسة وتحديث بياناتها بمرونة كاملة
                             updateData.bride = { fullName, phone };
                         }
 
+                        // تحديث المجموعتين معاً في فايربيس
                         await updateDoc(docRef, updateData);
+                        await setDoc(checkRef, updateData, { merge: true });
 
                         localStorage.setItem('userName', fullName);
                         localStorage.setItem('userRole', role);

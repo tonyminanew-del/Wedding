@@ -65,14 +65,7 @@
             const currentUserId = localStorage.getItem('userId');
 
             if (!currentUserId) {
-                document.getElementById('displayId').innerText = "لا توجد بيانات";
-                document.getElementById('displayGroom').innerText = "لا توجد بيانات";
-                document.getElementById('displayBride').innerText = "لا توجد بيانات";
-                document.getElementById('displayGroomPhone').innerText = "لا توجد بيانات";
-                document.getElementById('displayBridePhone').innerText = "لا توجد بيانات";
-                statusBadge.innerText = 'لا توجد بيانات';
-                statusBadge.style.backgroundColor = '#f8d7da';
-                statusBadge.style.color = '#721c24';
+                statusBadge.innerText = 'لا توجد بيانات تسجيل دخول';
                 appointmentBtn.style.display = 'none';
                 return;
             }
@@ -82,14 +75,7 @@
                 const docSnap = await getDoc(docRef);
 
                 if (!docSnap.exists()) {
-                    document.getElementById('displayId').innerText = "لا توجد بيانات";
-                    document.getElementById('displayGroom').innerText = "لا توجد بيانات";
-                    document.getElementById('displayBride').innerText = "لا توجد بيانات";
-                    document.getElementById('displayGroomPhone').innerText = "لا توجد بيانات";
-                    document.getElementById('displayBridePhone').innerText = "لا توجد بيانات";
-                    statusBadge.innerText = 'لا توجد بيانات';
-                    statusBadge.style.backgroundColor = '#f8d7da';
-                    statusBadge.style.color = '#721c24';
+                    statusBadge.innerText = 'الباقة غير موجودة';
                     appointmentBtn.style.display = 'none';
                     return;
                 }
@@ -102,13 +88,9 @@
                 document.getElementById('displayGroomPhone').innerText = (data.groom && data.groom.phone) ? data.groom.phone : 'لا توجد بيانات';
                 document.getElementById('displayBridePhone').innerText = (data.bride && data.bride.phone) ? data.bride.phone : 'لا توجد بيانات';
 
-                // فحص الحالات المختلفة (سواء كانت في documentsStatus أو status)
-                const docStatus = data.documentsStatus || data.status || 'قيد المراجعة';
-                console.log("الحالة الحالية المسترجعة من القاعدة:", docStatus); // لمساعدتك في رؤية القيمة بـ Console
+                const rawStatus = data.documentsStatus || data.status || data.approval || data.state || 'قيد المراجعة';
+                const cleanStatus = String(rawStatus).trim().toLowerCase();
 
-                const cleanStatus = String(docStatus).trim().toLowerCase();
-
-                // التحقق من كافة الكلمات الدالة على القبول أو الموافقة
                 const isAccepted = 
                     cleanStatus.includes('قبول') || 
                     cleanStatus.includes('مقبول') || 
@@ -116,22 +98,23 @@
                     cleanStatus.includes('accept') || 
                     cleanStatus.includes('approved') ||
                     cleanStatus.includes('معتمد') ||
-                    cleanStatus.includes('تم');
+                    cleanStatus.includes('تم') ||
+                    cleanStatus === 'true';
 
                 if (isAccepted) {
                     statusBadge.innerText = 'مقبولة ✅';
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';
-                    appointmentBtn.style.display = 'block'; // إظهار زر الانتقال لصفحة clock.html
+                    appointmentBtn.style.display = 'block'; 
                 } else {
-                    statusBadge.innerText = docStatus;
+                    statusBadge.innerText = rawStatus;
                     statusBadge.style.backgroundColor = '#f8d7da';
                     statusBadge.style.color = '#721c24';
                     appointmentBtn.style.display = 'none';
                 }
 
             } catch (error) {
-                console.error("خطأ في جلب البيانات:", error);
+                console.error("خطأ في الاتصال:", error);
                 statusBadge.innerText = "خطأ في الاتصال";
             }
         });

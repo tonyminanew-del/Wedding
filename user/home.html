@@ -71,7 +71,8 @@
             }
 
             try {
-                const docRef = doc(db, "WeddingPackages", currentUserId);
+                // التعديل هنا: البحث في مجموعة "check" ليتطابق مع لوحة تحكم أب الكاهن
+                const docRef = doc(db, "check", currentUserId);
                 const docSnap = await getDoc(docRef);
 
                 if (!docSnap.exists()) {
@@ -88,8 +89,7 @@
                 document.getElementById('displayGroomPhone').innerText = (data.groom && data.groom.phone) ? data.groom.phone : 'لا توجد بيانات';
                 document.getElementById('displayBridePhone').innerText = (data.bride && data.bride.phone) ? data.bride.phone : 'لا توجد بيانات';
 
-                // فحص جميع الاحتمالات الممكنة لحقل الحالة في قاعدة البيانات
-                const rawStatus = data.DocumentsStatus || data.documentsStatus || data.status || data.PapersStatus || data.approval || 'قيد المراجعة';
+                const rawStatus = data.documentsStatus || data.status || 'قيد المراجعة';
                 const cleanStatus = String(rawStatus).trim().toLowerCase();
 
                 const isAccepted = 
@@ -99,14 +99,13 @@
                     cleanStatus.includes('accept') || 
                     cleanStatus.includes('approved') ||
                     cleanStatus.includes('معتمد') ||
-                    cleanStatus.includes('تم') ||
-                    cleanStatus === 'true';
+                    cleanStatus.includes('تم');
 
                 if (isAccepted) {
                     statusBadge.innerText = 'مقبولة ✅';
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';
-                    appointmentBtn.style.display = 'block'; 
+                    appointmentBtn.style.display = 'block'; // ظهور زر الموعد فوراً
                 } else {
                     statusBadge.innerText = rawStatus;
                     statusBadge.style.backgroundColor = '#f8d7da';

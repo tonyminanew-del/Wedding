@@ -89,7 +89,7 @@
 
             if (!packageId) {
                 alert("خطأ: لم يتم العثور على حسابك المسجل، يرجى تسجيل الدخول مرة أخرى.");
-                window.location.href = "index.html";
+                window.location.href = "home.html";
                 return;
             }
 
@@ -137,7 +137,7 @@
                 statusMessage.textContent = "تم حفظ الصور وإرسالها بنجاح! جاري التحويل...";
 
                 setTimeout(() => {
-                    window.location.href = "main.html";
+                    window.location.href = "home.html";
                 }, 2000);
 
             } catch (error) {

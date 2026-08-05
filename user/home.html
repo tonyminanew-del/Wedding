@@ -62,7 +62,6 @@
             const statusBadge = document.getElementById('displayDocStatus');
             const appointmentBtn = document.getElementById('appointmentBtn');
 
-            // جلب الـ ID الخاص بالعريس أو الباقة المخزن أثناء التسجيل
             const currentUserId = localStorage.getItem('userId');
 
             if (!currentUserId) {
@@ -79,7 +78,6 @@
             }
 
             try {
-                // البحث بالـ ID الخاص بالعريس/الباقة في مجموعة WeddingPackages
                 const docRef = doc(db, "WeddingPackages", currentUserId);
                 const docSnap = await getDoc(docRef);
 
@@ -96,7 +94,6 @@
                     return;
                 }
 
-                // إذا وجد الـ ID، جلب وجرض كل البيانات الموجودة بالباقة
                 const data = docSnap.data();
 
                 document.getElementById('displayId').innerText = data.packageId || currentUserId;
@@ -105,21 +102,27 @@
                 document.getElementById('displayGroomPhone').innerText = (data.groom && data.groom.phone) ? data.groom.phone : 'لا توجد بيانات';
                 document.getElementById('displayBridePhone').innerText = (data.bride && data.bride.phone) ? data.bride.phone : 'لا توجد بيانات';
 
+                // فحص الحالات المختلفة (سواء كانت في documentsStatus أو status)
                 const docStatus = data.documentsStatus || data.status || 'قيد المراجعة';
+                console.log("الحالة الحالية المسترجعة من القاعدة:", docStatus); // لمساعدتك في رؤية القيمة بـ Console
+
                 const cleanStatus = String(docStatus).trim().toLowerCase();
 
+                // التحقق من كافة الكلمات الدالة على القبول أو الموافقة
                 const isAccepted = 
                     cleanStatus.includes('قبول') || 
                     cleanStatus.includes('مقبول') || 
                     cleanStatus.includes('مقبولة') || 
                     cleanStatus.includes('accept') || 
-                    cleanStatus.includes('approved');
+                    cleanStatus.includes('approved') ||
+                    cleanStatus.includes('معتمد') ||
+                    cleanStatus.includes('تم');
 
                 if (isAccepted) {
                     statusBadge.innerText = 'مقبولة ✅';
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';
-                    appointmentBtn.style.display = 'block';
+                    appointmentBtn.style.display = 'block'; // إظهار زر الانتقال لصفحة clock.html
                 } else {
                     statusBadge.innerText = docStatus;
                     statusBadge.style.backgroundColor = '#f8d7da';
@@ -129,14 +132,7 @@
 
             } catch (error) {
                 console.error("خطأ في جلب البيانات:", error);
-                document.getElementById('displayId').innerText = "لا توجد بيانات";
-                document.getElementById('displayGroom').innerText = "لا توجد بيانات";
-                document.getElementById('displayBride').innerText = "لا توجد بيانات";
-                document.getElementById('displayGroomPhone').innerText = "لا توجد بيانات";
-                document.getElementById('displayBridePhone').innerText = "لا توجد بيانات";
-                statusBadge.innerText = "لا توجد بيانات";
-                statusBadge.style.backgroundColor = '#f8d7da';
-                statusBadge.style.color = '#721c24';
+                statusBadge.innerText = "خطأ في الاتصال";
             }
         });
     </script>

@@ -1,1 +1,283 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تأكيد موعد الحجز</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #f4f6f9 0%, #e4e9f0 100%); 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 15px; 
+            color: #2c3e50; 
+        }
+
+        .booking-container { 
+            background: #ffffff; 
+            padding: 25px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); 
+            width: 100%; 
+            max-width: 480px; 
+            border-top: 5px solid #c5a059; 
+        }
+
+        .cross-symbol { 
+            font-size: 24px; 
+            color: #c5a059; 
+            background: #fdfcf7; 
+            width: 50px; 
+            height: 50px; 
+            line-height: 50px; 
+            border-radius: 50%; 
+            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2); 
+            text-align: center;
+            margin: 0 auto 15px auto;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #475569;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        input:focus {
+            border-color: #c5a059;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
+        }
+
+        .info-box {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            border-right: 4px solid #c5a059;
+            line-height: 1.6;
+        }
+
+        .price-box {
+            background: #fdfcf7;
+            border: 1.5px dashed #c5a059;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #c5a059;
+            margin: 15px 0;
+        }
+
+        .ok-btn { 
+            width: 100%;
+            background-color: #27ae60; 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 12px; 
+            font-size: 15px; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.2s; 
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.25);
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .ok-btn:hover { 
+            background-color: #219653; 
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <div class="booking-container">
+        <div class="cross-symbol">✝</div>
+        <h2>تأكيد موعد الحجز</h2>
+
+        <div class="info-box" id="loadingInfo">
+            جاري سحب بيانات العروسين من قاعدة البيانات...
+        </div>
+
+        <div class="form-group">
+            <label>تاريخ الموعد:</label>
+            <input type="date" id="bookingDate">
+        </div>
+
+        <div class="form-group">
+            <label>وقت الموعد (الساعة):</label>
+            <input type="time" id="bookingTime">
+        </div>
+
+        <div class="price-box">
+            رسوم الحجز الكلية: 500 جنيه مصري
+        </div>
+
+        <button class="ok-btn" id="okBtn" disabled>OK - تأكيد الحجز وإرسال للواتساب</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
+          authDomain: "wedding-34f49.firebaseapp.com",
+          projectId: "wedding-34f49",
+          storageBucket: "wedding-34f49.firebasestorage.app",
+          messagingSenderId: "1071878294617",
+          appId: "1:1071878294617:web:5e7138d17a3aa78366f548",
+          measurementId: "G-69VMQJT1Z8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const packageId = localStorage.getItem('userId');
+        if (!packageId) {
+            alert("يرجى تسجيل الدخول أولاً.");
+            window.location.href = "home.html";
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('bookingDate').min = todayStr;
+
+        let retrievedData = {};
+        const loadingInfo = document.getElementById('loadingInfo');
+        const okBtn = document.getElementById('okBtn');
+
+        async function fetchUserData() {
+            try {
+                const docRef = doc(db, "WeddingPackages", packageId);
+                const snap = await getDoc(docRef);
+                
+                if (snap.exists()) {
+                    retrievedData = snap.data();
+                    const groomName = retrievedData.groom?.fullName || retrievedData.fullName || "غير مسجل";
+                    const groomPhone = retrievedData.groom?.phone || retrievedData.phone || "غير مسجل";
+                    const brideName = retrievedData.bride?.fullName || "غير مسجل";
+
+                    loadingInfo.innerHTML = `
+                        <b>بيانات الحجز:</b><br>
+                        - العريس: ${groomName} (${groomPhone})<br>
+                        - العروسة: ${brideName}
+                    `;
+                    okBtn.disabled = false;
+                } else {
+                    loadingInfo.innerHTML = "لم يتم العثور على بيانات لهذا الحساب.";
+                }
+            } catch (err) {
+                console.error("خطأ في جلب البيانات:", err);
+                loadingInfo.innerHTML = "حدث خطأ أثناء جلب البيانات من القاعدة.";
+            }
+        }
+
+        fetchUserData();
+
+        okBtn.addEventListener('click', async () => {
+            const bookingDate = document.getElementById('bookingDate').value;
+            const bookingTime = document.getElementById('bookingTime').value;
+
+            if (!bookingDate || !bookingTime) {
+                alert("يرجى اختيار تاريخ ووقت الموعد أولاً.");
+                return;
+            }
+
+            const selectedDateTime = new Date(`${bookingDate}T${bookingTime}`);
+            const now = new Date();
+
+            if (selectedDateTime < now) {
+                alert("عذراً، لا يمكن اختيار تاريخ أو وقت قديم/منقضٍ.");
+                return;
+            }
+
+            try {
+                okBtn.disabled = true;
+                okBtn.textContent = "جاري فحص الموعد...";
+
+                const querySnapshot = await getDocs(collection(db, "WeddingPackages"));
+                let isTaken = false;
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (data.date === bookingDate && data.time === bookingTime && docSnap.id !== packageId) {
+                        isTaken = true;
+                    }
+                });
+
+                if (isTaken) {
+                    alert("عذراً، هذا الموعد محجوز بالفعل مسبقاً. يرجى اختيار وقت آخر.");
+                    okBtn.disabled = false;
+                    okBtn.textContent = "OK - تأكيد الحجز وإرسال للواتساب";
+                    return;
+                }
+
+                const groomName = retrievedData.groom?.fullName || retrievedData.fullName || "غير مسجل";
+                const groomPhone = retrievedData.groom?.phone || retrievedData.phone || "غير مسجل";
+                const brideName = retrievedData.bride?.fullName || "غير مسجل";
+
+                const whatsappNumber = "201203821961";
+                const message = `مرحباً، تفاصيل طلب حجز موعد جديد:
+- اسم العريس: ${groomName}
+- رقم الهاتف: ${groomPhone}
+- اسم العروسة (الخطيبة): ${brideName}
+- التاريخ: ${bookingDate}
+- الوقت: ${bookingTime}
+- رسوم الحجز: 500 جنيه`;
+
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+                // فتح الواتساب في نافذة جديدة لتجاوز حظر المتصفحات
+                const newWindow = window.open(whatsappUrl, '_blank');
+                
+                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                    // لو المتصفح منع النافذة المنبثقة، نحول الصفحة مباشرة
+                    window.location.href = whatsappUrl;
+                }
+
+                okBtn.disabled = false;
+                okBtn.textContent = "OK - تأكيد الحجز وإرسال للواتساب";
+
+            } catch (error) {
+                console.error("خطأ:", error);
+                alert("حدث خطأ، يرجى المحاولة مرة أخرى.");
+                okBtn.disabled = false;
+                okBtn.textContent = "OK - تأكيد الحجز وإرسال للواتساب";
+            }
+        });
+    </script>
+</body>
+</html>
 

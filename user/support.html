@@ -1,1 +1,465 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التواصل والاستفسار مع الكنيسة</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #f4f6f9 0%, #e4e9f0 100%); 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: #2c3e50; 
+            padding: 15px; 
+        }
+
+        .chat-container { 
+            background: #ffffff; 
+            padding: 22px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); 
+            width: 100%; 
+            max-width: 480px; 
+            border-top: 5px solid #c5a059; 
+            display: flex; 
+            flex-direction: column; 
+            height: 92vh; 
+            max-height: 780px; 
+        }
+
+        .chat-header {
+            text-align: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: right;
+        }
+
+        /* حاوية الصورة الشخصية */
+        .avatar-upload {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #c5a059;
+            cursor: pointer;
+            background: #fdfcf7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .avatar-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .user-welcome-info h3 {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        .user-welcome-info p {
+            font-size: 11px;
+            color: #c5a059;
+            font-weight: 600;
+        }
+
+        .cross-symbol { 
+            font-size: 20px; 
+            color: #c5a059; 
+            background: #fdfcf7; 
+            width: 38px; 
+            height: 38px; 
+            line-height: 38px; 
+            border-radius: 50%; 
+            box-shadow: 0 3px 8px rgba(197, 160, 89, 0.15); 
+            text-align: center;
+        }
+
+        /* صندوق الشات */
+        .chat-messages { 
+            flex: 1; 
+            border: 1.5px solid #edf2f7; 
+            border-radius: 16px; 
+            background: #f8fafc; 
+            padding: 15px; 
+            overflow-y: auto; 
+            margin-bottom: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+        }
+        
+        .message-bubble { 
+            background: #ffffff; 
+            padding: 10px 14px; 
+            border-radius: 14px; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03); 
+            max-width: 82%; 
+            font-size: 13.5px; 
+            line-height: 1.5; 
+            word-break: break-word; 
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        
+        .message-bubble.admin { 
+            border-right: 4px solid #27ae60; 
+            background: #f0fdf4; 
+            align-self: flex-start; 
+        }
+        
+        .message-bubble.user { 
+            border-right: 4px solid #c5a059; 
+            background: #fffdf9;
+            align-self: flex-end; 
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+        
+        .msg-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        .msg-content {
+            flex: 1;
+        }
+
+        .msg-sender {
+            font-size: 11px; 
+            font-weight: 700;
+            display: block; 
+            margin-bottom: 3px; 
+        }
+
+        .message-bubble.admin .msg-sender { color: #27ae60; }
+        .message-bubble.user .msg-sender { color: #c5a059; }
+
+        .msg-time { 
+            font-size: 9.5px; 
+            color: #94a3b8; 
+            display: block; 
+            margin-top: 4px; 
+            text-align: left; 
+        }
+        
+        /* مكان الكتابة */
+        .input-container { 
+            display: flex; 
+            align-items: center; 
+            background: #f1f5f9; 
+            border: 1.5px solid #cbd5e1; 
+            border-radius: 16px; 
+            padding: 6px 8px; 
+            transition: all 0.3s ease;
+        }
+
+        .input-container:focus-within {
+            border-color: #c5a059;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
+        }
+
+        textarea { 
+            flex: 1; 
+            border: none; 
+            background: transparent; 
+            padding: 8px; 
+            font-size: 13.5px; 
+            outline: none; 
+            resize: none; 
+            height: 42px; 
+            max-height: 100px;
+            color: #2c3e50;
+        }
+        
+        .send-btn { 
+            background-color: #c5a059; 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            width: 42px; 
+            height: 42px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            box-shadow: 0 3px 8px rgba(197, 160, 89, 0.25);
+            flex-shrink: 0;
+        }
+        
+        .send-btn:hover { 
+            background-color: #b08d48; 
+            transform: scale(1.05);
+        }
+
+        .back-link { 
+            display: block; 
+            margin-top: 10px; 
+            color: #7f8c8d; 
+            text-decoration: none; 
+            font-size: 12px; 
+            text-align: center; 
+            transition: color 0.3s;
+        }
+        
+        .back-link:hover { color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="profile-section">
+                <div class="avatar-upload" title="اضغط لتغيير صورتك الشخصية">
+                    <img id="userAvatarImg" src="" alt="صورة البروفايل" onerror="this.src='https://via.placeholder.com/45?text=👤'">
+                    <input type="file" id="avatarInput" accept="image/*">
+                </div>
+                <div class="user-welcome-info">
+                    <h3 id="userTitleName">جاري التحميل...</h3>
+                    <p id="userRoleBadge">...</p>
+                </div>
+            </div>
+            <div class="cross-symbol">✝</div>
+        </div>
+        
+        <div class="chat-messages" id="chatContainer">
+            <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-top: 25px;">جاري تحميل المحادثات...</div>
+        </div>
+
+        <div class="input-container">
+            <textarea id="supportText" placeholder="اكتب رسالتك لأبونا هنا... (اضغط Enter للإرسال)"></textarea>
+            <button class="send-btn" id="sendBtn" title="إرسال">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+
+        <a href="clock.html" class="back-link">⟵ العودة لوحة الخدمات</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
+          authDomain: "wedding-34f49.firebaseapp.com",
+          projectId: "wedding-34f49",
+          storageBucket: "wedding-34f49.firebasestorage.app",
+          messagingSenderId: "1071878294617",
+          appId: "1:1071878294617:web:5e7138d17a3aa78366f548",
+          measurementId: "G-69VMQJT1Z8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const packageId = localStorage.getItem('userId');
+        if (!packageId) {
+            alert("يرجى تسجيل الدخول أولاً.");
+            window.location.href = "home.html";
+        }
+
+        const userTitleName = document.getElementById('userTitleName');
+        const userRoleBadge = document.getElementById('userRoleBadge');
+        const userAvatarImg = document.getElementById('userAvatarImg');
+        const avatarInput = document.getElementById('avatarInput');
+        const chatContainer = document.getElementById('chatContainer');
+        const sendBtn = document.getElementById('sendBtn');
+        const supportText = document.getElementById('supportText');
+
+        let currentUserName = "مستخدم";
+        let currentUserRole = "عريس/عروسة";
+        let currentUserAvatar = "";
+
+        // جلب بيانات الباقة من فايربيس لمعرفة هل هو العريس أم العروسة وأسمائهم
+        async function fetchAccountData() {
+            try {
+                const docRef = doc(db, "WeddingPackages", packageId);
+                const snap = await getDoc(docRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    
+                    // نحدد هل تم الدخول من خلال بيانات العريس أم العروسة (يمكنك تعديل الشرط حسب تخزينك أو تفضيلك)
+                    // فرضا سنفحص الـ localStorage أو نعرض اسميهما معاً
+                    const groomName = data.groom?.fullName || "العريس";
+                    const brideName = data.bride?.fullName || "العروسة";
+
+                    // افتراضياً نأخذ اسم الحساب المسجل أو نتيحه يختار/يظهر كعريس أو عروسة
+                    let roleType = localStorage.getItem('userRoleType') || 'groom'; // groom أو bride
+                    
+                    if (roleType === 'groom') {
+                        currentUserName = groomName;
+                        currentUserRole = "🤵 العريس";
+                        userTitleName.textContent = `أهلاً بك يا عريسنا: ${groomName}`;
+                    } else {
+                        currentUserName = brideName;
+                        currentUserRole = "👰 العروسة";
+                        userTitleName.textContent = `أهلاً بكِ يا عروسنا: ${brideName}`;
+                    }
+                    userRoleBadge.textContent = currentUserRole;
+
+                    // تحميل الصورة الشخصية المحفوظة مسبقاً إن وجدت
+                    if (roleType === 'groom' && data.groom?.avatar) {
+                        currentUserAvatar = data.groom.avatar;
+                        userAvatarImg.src = currentUserAvatar;
+                    } else if (roleType === 'bride' && data.bride?.avatar) {
+                        currentUserAvatar = data.bride.avatar;
+                        userAvatarImg.src = currentUserAvatar;
+                    }
+                }
+            } catch (err) {
+                console.error("خطأ في جلب البيانات:", err);
+            }
+        }
+
+        fetchAccountData();
+
+        // دالة لضغط وتحويل صورة البروفايل لـ Base64 وحفظها فوراً
+        avatarInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const max = 300; // تصغير الأبعاد لتكون مناسبة وسريعة كصورة بروفايل
+                    if (width > height) { if (width > max) { height *= max / width; width = max; } }
+                    else { if (height > max) { width *= max / height; height = max; } }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const base64Img = canvas.toDataURL('image/jpeg', 0.7);
+
+                    currentUserAvatar = base64Img;
+                    userAvatarImg.src = base64Img;
+
+                    // حفظ الصورة في قاعدة البيانات تحت ملف الباقة
+                    try {
+                        let roleType = localStorage.getItem('userRoleType') || 'groom';
+                        const docRef = doc(db, "WeddingPackages", packageId);
+                        const updateData = roleType === 'groom' ? { "groom.avatar": base64Img } : { "bride.avatar": base64Img };
+                        await setDoc(docRef, updateData, { merge: true });
+                    } catch (error) {
+                        console.error("فشل حفظ الصورة:", error);
+                    }
+                };
+            };
+        });
+
+        // الاستماع للشات المباشر
+        const messagesRef = collection(db, "WeddingPackages", packageId, "Messages");
+        const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+        onSnapshot(q, (snapshot) => {
+            chatContainer.innerHTML = "";
+            if (snapshot.empty) {
+                chatContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; font-size: 13px; margin-top: 25px;">لا توجد رسائل سابقة. ابدأ المحادثة الآن مع الكنيسة!</div>`;
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const msgData = docSnap.data();
+                const isKalon = msgData.senderRole === 'ابونا' || msgData.senderRole === 'admin';
+                
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `message-bubble ${isKalon ? 'admin' : 'user'}`;
+                
+                const timeString = msgData.timestamp ? new Date(msgData.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                const senderAvatar = msgData.senderAvatar || 'https://via.placeholder.com/30?text=👤';
+
+                msgDiv.innerHTML = `
+                    <img src="${senderAvatar}" class="msg-avatar" onerror="this.src='https://via.placeholder.com/30?text=👤'">
+                    <div class="msg-content">
+                        <span class="msg-sender">${msgData.senderName} (${msgData.senderRole})</span>
+                        <span>${msgData.text}</span>
+                        <span class="msg-time">${timeString}</span>
+                    </div>
+                `;
+                chatContainer.appendChild(msgDiv);
+            });
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        });
+
+        // إرسال الرسالة
+        const sendMessage = async () => {
+            const text = supportText.value.trim();
+            if (!text) return;
+
+            try {
+                sendBtn.disabled = true;
+                
+                await addDoc(messagesRef, {
+                    text: text,
+                    senderName: currentUserName,
+                    senderRole: currentUserRole,
+                    senderAvatar: currentUserAvatar || "",
+                    timestamp: new Date()
+                });
+
+                supportText.value = "";
+            } catch (error) {
+                console.error("خطأ في الإرسال: ", error);
+                alert("حدث خطأ أثناء إرسال الرسالة.");
+            } finally {
+                sendBtn.disabled = false;
+                supportText.focus();
+            }
+        };
+
+        sendBtn.addEventListener('click', sendMessage);
+        supportText.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
 

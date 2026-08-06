@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -28,7 +28,7 @@
     <div class="container">
         <div class="cross-symbol">✝</div>
         <h2>رفع المستندات كصور مباشرة</h2>
-        <p class="subtitle">سيتم حفظ الصور كبيانات مباشرة في قاعدة البيانات لإظهارها للكاهن</p>
+        <p class="subtitle">سيتم ضغط الصور وحفظها كبيانات مباشرة في قاعدة البيانات لإظهارها للكاهن</p>
 
         <div id="uploadForm">
             <div class="form-group">
@@ -72,13 +72,46 @@
         const submitDocsBtn = document.getElementById('submitDocsBtn');
         const statusMessage = document.getElementById('statusMessage');
 
-        // دالة لتحويل ملف الصورة إلى Base64
-        const convertFileToBinary = (file) => {
+        // دالة لضغط الصورة وتحويلها إلى Base64 بحجم آمن لفايربيس
+        const compressImage = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // تصغير الأبعاد الكبيرة للصور لتقليل الحجم
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // ضغط الجودة إلى 70% لتقليل المساحة بشكل كبير
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        resolve(dataUrl);
+                    };
+                    img.onerror = (error) => reject(error);
+                };
+                reader.onerror = (error) => reject(error);
             });
         };
 
@@ -101,15 +134,15 @@
 
             submitDocsBtn.disabled = true;
             statusMessage.style.color = "#3498db";
-            statusMessage.textContent = "جاري معالجة وتحويل الصور...";
+            statusMessage.textContent = "جاري ضغط ومعالجة الصور...";
 
             try {
                 const idCardFile = idCardInput.files[0];
                 const certificateFile = certificateInput.files[0];
 
-                // تحويل الصورتين إلى بيانات ثنائية (Base64) لتخزينها مباشرة
-                const idCardBase64 = await convertFileToBinary(idCardFile);
-                const certificateBase64 = await convertFileToBinary(certificateFile);
+                // ضغط الصور وتحويلها لـ Base64 بحجم خفيف
+                const idCardBase64 = await compressImage(idCardFile);
+                const certificateBase64 = await compressImage(certificateFile);
 
                 statusMessage.textContent = "جاري حفظ الصور في قاعدة البيانات...";
 
@@ -128,8 +161,8 @@
                     bride: packageData.bride || { fullName: "غير معروف" },
                     assignedPriest: packageData.assignedPriest || localStorage.getItem('assignedPriest') || "غير محدد",
                     documentsStatus: "قيد المراجعة",
-                    idCardUrl: idCardBase64,         // سيتم تخزين بيانات الصورة الحقيقية هنا
-                    certificateUrl: certificateBase64, // سيتم تخزين بيانات الشهادة الحقيقية هنا
+                    idCardUrl: idCardBase64,         
+                    certificateUrl: certificateBase64, 
                     submittedAt: new Date().toISOString()
                 }, { merge: true });
 
@@ -143,7 +176,7 @@
             } catch (error) {
                 console.error("خطأ مفصل:", error);
                 statusMessage.style.color = "#e74c3c";
-                statusMessage.textContent = "فشل الحفظ: حجم الملف قد يكون كبيراً جداً (أكبر من 1 ميجابايت).";
+                statusMessage.textContent = "فشل الحفظ: تأكد من اختيار صور صالحة وحجمها المقبول.";
                 submitDocsBtn.disabled = false;
                 submitDocsBtn.textContent = "حفظ وإرسال الصور ✝";
             }

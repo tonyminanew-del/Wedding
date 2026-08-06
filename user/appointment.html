@@ -111,8 +111,6 @@
             transition: all 0.2s; 
             box-shadow: 0 4px 12px rgba(39, 174, 96, 0.25);
             text-align: center;
-            text-decoration: none;
-            display: inline-block;
         }
         
         .ok-btn:hover { 
@@ -184,14 +182,19 @@
                 
                 if (snap.exists()) {
                     retrievedData = snap.data();
+                    
+                    // قراءة بيانات العريس من الـ map أو الحقول العادية
                     const groomName = retrievedData.groom?.fullName || retrievedData.fullName || "غير مسجل";
                     const groomPhone = retrievedData.groom?.phone || retrievedData.phone || "غير مسجل";
-                    const brideName = retrievedData.bride?.fullName || "غير مسجل";
+                    
+                    // قراءة بيانات العروسة من الـ map بدقة حسب قاعدة البيانات لديك
+                    const brideName = retrievedData.bride?.fullName || retrievedData.brideName || "غير مسجل";
+                    const bridePhone = retrievedData.bride?.phone || retrievedData.bridePhone || "غير مسجل";
 
                     loadingInfo.innerHTML = `
                         <b>بيانات الحجز:</b><br>
                         - العريس: ${groomName} (${groomPhone})<br>
-                        - العروسة: ${brideName}
+                        - العروسة: ${brideName} (${bridePhone})
                     `;
                     okBtn.disabled = false;
                 } else {
@@ -245,13 +248,15 @@
 
                 const groomName = retrievedData.groom?.fullName || retrievedData.fullName || "غير مسجل";
                 const groomPhone = retrievedData.groom?.phone || retrievedData.phone || "غير مسجل";
-                const brideName = retrievedData.bride?.fullName || "غير مسجل";
+                const brideName = retrievedData.bride?.fullName || retrievedData.brideName || "غير مسجل";
+                const bridePhone = retrievedData.bride?.phone || retrievedData.bridePhone || "غير مسجل";
 
                 const whatsappNumber = "201203821961";
                 const message = `مرحباً، تفاصيل طلب حجز موعد جديد:
 - اسم العريس: ${groomName}
-- رقم الهاتف: ${groomPhone}
-- اسم العروسة (الخطيبة): ${brideName}
+- هاتف العريس: ${groomPhone}
+- اسم العروسة: ${brideName}
+- هاتف العروسة: ${bridePhone}
 - التاريخ: ${bookingDate}
 - الوقت: ${bookingTime}
 - رسوم الحجز: 500 جنيه`;
@@ -259,16 +264,8 @@
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
-                // فتح الواتساب في نافذة جديدة لتجاوز حظر المتصفحات
-                const newWindow = window.open(whatsappUrl, '_blank');
-                
-                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-                    // لو المتصفح منع النافذة المنبثقة، نحول الصفحة مباشرة
-                    window.location.href = whatsappUrl;
-                }
-
-                okBtn.disabled = false;
-                okBtn.textContent = "OK - تأكيد الحجز وإرسال للواتساب";
+                // الانتقال للواتساب مباشرة بدون أخطاء
+                window.location.href = whatsappUrl;
 
             } catch (error) {
                 console.error("خطأ:", error);
@@ -280,4 +277,3 @@
     </script>
 </body>
 </html>
-

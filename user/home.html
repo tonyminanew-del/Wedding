@@ -3,54 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة متابعة سر الإكليل</title>
+    <title>تأكيد موعد الحجز</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh; color: #2c3e50; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .card { background: #ffffff; width: 100%; max-width: 500px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: right; border-top: 5px solid #c5a059; }
-        .header-icon { text-align: center; font-size: 32px; color: #c5a059; margin-bottom: 10px; }
-        h2 { text-align: center; color: #2c3e50; margin-bottom: 5px; font-size: 22px; }
-        p.subtitle { text-align: center; color: #7f8c8d; font-size: 13px; margin-bottom: 25px; }
-        .info-box { background: #fdfcf7; border: 1.5px solid #e9ecef; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 14px; line-height: 1.8; }
-        .info-box strong { color: #c5a059; }
-        .action-btn { display: block; width: 100%; background-color: #2c3e50; color: white; border: none; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; transition: background 0.3s; margin-top: 15px; }
-        .action-btn:hover { background-color: #1a252f; }
-        .appointment-btn { background-color: #27ae60 !important; display: none; margin-top: 10px; }
-        .appointment-btn:hover { background-color: #219653 !important; }
-        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #eef2f7; color: #2980b9; }
-        .appointment-info-box { background: #f0fdf4; border: 1.5px dashed #27ae60; padding: 12px; border-radius: 10px; margin-top: 15px; display: none; font-size: 13.5px; line-height: 1.6; color: #166534; }
+        
+        body { 
+            background: linear-gradient(135deg, #f4f6f9 0%, #e4e9f0 100%); 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 15px; 
+            color: #2c3e50; 
+        }
+
+        .booking-container { 
+            background: #ffffff; 
+            padding: 25px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); 
+            width: 100%; 
+            max-width: 480px; 
+            border-top: 5px solid #c5a059; 
+        }
+
+        .cross-symbol { 
+            font-size: 24px; 
+            color: #c5a059; 
+            background: #fdfcf7; 
+            width: 50px; 
+            height: 50px; 
+            line-height: 50px; 
+            border-radius: 50%; 
+            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2); 
+            text-align: center;
+            margin: 0 auto 15px auto;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #475569;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        input:focus {
+            border-color: #c5a059;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
+        }
+
+        .info-box {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            border-right: 4px solid #c5a059;
+            line-height: 1.6;
+        }
+
+        .price-box {
+            background: #fdfcf7;
+            border: 1.5px dashed #c5a059;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #c5a059;
+            margin: 15px 0;
+        }
+
+        .ok-btn { 
+            width: 100%;
+            background-color: #27ae60; 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 12px; 
+            font-size: 15px; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.2s; 
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.25);
+            text-align: center;
+        }
+        
+        .ok-btn:hover { 
+            background-color: #219653; 
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body>
+    <div class="booking-container">
+        <div class="cross-symbol">✝</div>
+        <h2>تأكيد موعد الحجز</h2>
 
-    <div class="card">
-        <div class="header-icon">✝</div>
-        <h2>لوحة متابعة سر الإكليل</h2>
-        <p class="subtitle">متابعة تفاصيل الباقة وحالة المستندات ومواعيد الفرح</p>
-
-        <div class="info-box" id="userInfoBox">
-            <p><strong>رقم الطلب (ID):</strong> <span id="displayId">-</span></p>
-            <p><strong>اسم العريس:</strong> <span id="displayGroom">لا توجد بيانات</span></p>
-            <p><strong>اسم العروسة:</strong> <span id="displayBride">لا توجد بيانات</span></p>
-            <p><strong>رقم هاتف العريس:</strong> <span id="displayGroomPhone">لا توجد بيانات</span></p>
-            <p><strong>رقم هاتف العروسة:</strong> <span id="displayBridePhone">لا توجد بيانات</span></p>
-            <p><strong>حالة المستندات:</strong> <span class="status-badge" id="displayDocStatus">غير متوفر</span></p>
+        <div class="info-box" id="loadingInfo">
+            جاري سحب بيانات العروسين من قاعدة البيانات...
         </div>
 
-        <div class="appointment-info-box" id="appointmentInfoBox">
-            <p><strong>📅 تاريخ الموعد المحجوز:</strong> <span id="displayApptDate">-</span></p>
-            <p><strong>⏰ ساعة الحجز:</strong> <span id="displayApptTime">-</span></p>
-            <p><strong>📌 حالة الموعد:</strong> <span id="displayApptStatus">قيد المتابعة</span></p>
+        <div class="form-group">
+            <label>تاريخ الموعد:</label>
+            <input type="date" id="bookingDate">
         </div>
 
-        <a href="documents.html" class="action-btn">رفع أو تعديل المستندات 📄</a>
-        
-        <a href="clock.html" class="action-btn appointment-btn" id="appointmentBtn">📅 اضغط هنا لتحديد/تعديل موعد الإكليل (تم قبول الأوراق)</a>
+        <div class="form-group">
+            <label>وقت الموعد (الساعة):</label>
+            <input type="time" id="bookingTime">
+        </div>
+
+        <div class="price-box">
+            رسوم الحجز الكلية: 500 جنيه مصري
+        </div>
+
+        <button class="ok-btn" id="okBtn" disabled>OK - تأكيد الحجز وإرسال للواتساب</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -65,77 +162,128 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            const statusBadge = document.getElementById('displayDocStatus');
-            const appointmentBtn = document.getElementById('appointmentBtn');
-            const appointmentInfoBox = document.getElementById('appointmentInfoBox');
+        const packageId = localStorage.getItem('userId');
+        if (!packageId) {
+            alert("يرجى تسجيل الدخول أولاً.");
+            window.location.href = "home.html";
+        }
 
-            const currentUserId = localStorage.getItem('userId');
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('bookingDate').min = todayStr;
 
-            if (!currentUserId) {
-                statusBadge.innerText = 'لا توجد بيانات تسجيل دخول';
-                appointmentBtn.style.display = 'none';
+        let retrievedData = {};
+        const loadingInfo = document.getElementById('loadingInfo');
+        const okBtn = document.getElementById('okBtn');
+
+        async function fetchUserData() {
+            try {
+                // جلب البيانات من WeddingPackages للتحقق منها وعرضها
+                const docRef = doc(db, "WeddingPackages", packageId);
+                const snap = await getDoc(docRef);
+                
+                if (snap.exists()) {
+                    retrievedData = snap.data();
+                    
+                    const groomName = retrievedData.groom?.fullName || retrievedData.fullName || "غير مسجل";
+                    const groomPhone = retrievedData.groom?.phone || retrievedData.phone || "غير مسجل";
+                    const brideName = retrievedData.bride?.fullName || retrievedData.brideName || "غير مسجل";
+                    const bridePhone = retrievedData.bride?.phone || retrievedData.bridePhone || "غير مسجل";
+
+                    loadingInfo.innerHTML = `
+                        <b>بيانات الحجز:</b><br>
+                        - العريس: ${groomName} (${groomPhone})<br>
+                        - العروسة: ${brideName} (${bridePhone})
+                    `;
+                    okBtn.disabled = false;
+                } else {
+                    loadingInfo.innerHTML = "لم يتم العثور على بيانات لهذا الحساب.";
+                }
+            } catch (err) {
+                console.error("خطأ في جلب البيانات:", err);
+                loadingInfo.innerHTML = "حدث خطأ أثناء جلب البيانات من القاعدة.";
+            }
+        }
+
+        fetchUserData();
+
+        okBtn.addEventListener('click', async () => {
+            const bookingDate = document.getElementById('bookingDate').value;
+            const bookingTime = document.getElementById('bookingTime').value;
+
+            if (!bookingDate || !bookingTime) {
+                alert("يرجى اختيار تاريخ ووقت الموعد أولاً.");
+                return;
+            }
+
+            const selectedDateTime = new Date(`${bookingDate}T${bookingTime}`);
+            const now = new Date();
+
+            if (selectedDateTime < now) {
+                alert("عذراً، لا يمكن اختيار تاريخ أو وقت قديم/منقضٍ.");
                 return;
             }
 
             try {
-                // البحث في مجموعة "check" ليتطابق مع لوحة تحكم أب الكاهن
-                const docRef = doc(db, "check", currentUserId);
-                const docSnap = await getDoc(docRef);
+                okBtn.disabled = true;
+                okBtn.textContent = "جاري حفظ الموعد وإرساله للكاهن...";
 
-                if (!docSnap.exists()) {
-                    statusBadge.innerText = 'الباقة غير موجودة';
-                    appointmentBtn.style.display = 'none';
+                // التحقق من تكرار الموعد في مجموعة check
+                const querySnapshot = await getDocs(collection(db, "check"));
+                let isTaken = false;
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (data.date === bookingDate && data.appointmentTimeText === bookingTime && docSnap.id !== packageId) {
+                        isTaken = true;
+                    }
+                });
+
+                if (isTaken) {
+                    alert("عذراً، هذا الموعد محجوز بالفعل مسبقاً. يرجى اختيار وقت آخر.");
+                    okBtn.disabled = false;
+                    okBtn.textContent = "OK - تأكيد الحجز وإرسال للواتساب";
                     return;
                 }
 
-                const data = docSnap.data();
+                const groomName = retrievedData.groom?.fullName || retrievedData.fullName || "غير مسجل";
+                const groomPhone = retrievedData.groom?.phone || retrievedData.phone || "غير مسجل";
+                const brideName = retrievedData.bride?.fullName || retrievedData.brideName || "غير مسجل";
+                const bridePhone = retrievedData.bride?.phone || retrievedData.bridePhone || "غير مسجل";
 
-                document.getElementById('displayId').innerText = data.packageId || currentUserId;
-                document.getElementById('displayGroom').innerText = (data.groom && data.groom.fullName) ? data.groom.fullName : 'لا توجد بيانات';
-                document.getElementById('displayBride').innerText = (data.bride && data.bride.fullName) ? data.bride.fullName : 'لا توجد بيانات';
-                document.getElementById('displayGroomPhone').innerText = (data.groom && data.groom.phone) ? data.groom.phone : 'لا توجد بيانات';
-                document.getElementById('displayBridePhone').innerText = (data.bride && data.bride.phone) ? data.bride.phone : 'لا توجد بيانات';
+                // **حفظ البيانات مباشرة في مجموعة "check" التي يقرأ منها الكاهن**
+                const checkDocRef = doc(db, "check", packageId);
+                await setDoc(checkDocRef, {
+                    ...retrievedData,
+                    date: bookingDate,
+                    time: bookingTime,
+                    appointmentTimeText: bookingTime,
+                    bookingTime: bookingTime
+                }, { merge: true });
 
-                // فحص وعرض بيانات الموعد إذا تم حجزها مسبقاً
-                const apptDate = data.date || data.selectedAppointment || data.appointmentDate || '';
-                const apptTime = data.appointmentTimeText || data.time || data.bookingTime || '';
-                const apptStatus = data.appointmentStatus || 'قيد المتابعة من الكاهن';
+                const whatsappNumber = "201203821961";
+                const message = `مرحباً، تفاصيل طلب حجز موعد جديد:
+- اسم العريس: ${groomName}
+- هاتف العريس: ${groomPhone}
+- اسم العروسة: ${brideName}
+- هاتف العروسة: ${bridePhone}
+- التاريخ: ${bookingDate}
+- الوقت: ${bookingTime}
+- رسوم الحجز: 500 جنيه`;
 
-                if (apptDate || apptTime) {
-                    document.getElementById('displayApptDate').innerText = apptDate || 'لم يُحدد بعد';
-                    document.getElementById('displayApptTime').innerText = apptTime || 'لم يُحدد بعد';
-                    document.getElementById('displayApptStatus').innerText = apptStatus;
-                    appointmentInfoBox.style.display = 'block'; // إظهار صندوق الموعد
-                }
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
-                const rawStatus = data.documentsStatus || data.status || 'قيد المراجعة';
-                const cleanStatus = String(rawStatus).trim().toLowerCase();
-
-                const isAccepted = 
-                    cleanStatus.includes('قبول') || 
-                    cleanStatus.includes('مقبول') || 
-                    cleanStatus.includes('مقبولة') || 
-                    cleanStatus.includes('accept') || 
-                    cleanStatus.includes('approved') ||
-                    cleanStatus.includes('معتمد') ||
-                    cleanStatus.includes('تم');
-
-                if (isAccepted) {
-                    statusBadge.innerText = 'مقبولة ✅';
-                    statusBadge.style.backgroundColor = '#d4edda';
-                    statusBadge.style.color = '#155724';
-                    appointmentBtn.style.display = 'block'; // ظهور زر اختيار الموعد فوراً
-                } else {
-                    statusBadge.innerText = rawStatus;
-                    statusBadge.style.backgroundColor = '#f8d7da';
-                    statusBadge.style.color = '#721c24';
-                    appointmentBtn.style.display = 'none';
-                }
+                // فتح الواتساب والانتقال للصفحة الرئيسية home.html
+                window.open(whatsappUrl, '_blank');
+                
+                alert("تم تأكيد الحجز بنجاح وإرساله للوحة تحكم الكاهن.");
+                window.location.href = "home.html";
 
             } catch (error) {
-                console.error("خطأ في الاتصال:", error);
-                statusBadge.innerText = "خطأ في الاتصال";
+                console.error("خطأ:", error);
+                alert("حدث خطأ أثناء الاتصال بقاعدة البيانات. تأكد من الإنترنت.");
+                okBtn.disabled = false;
+                okBtn.textContent = "OK - تأكيد الحجز وإرسال للواتساب";
             }
         });
     </script>

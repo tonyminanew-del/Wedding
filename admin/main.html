@@ -12,10 +12,6 @@
         .nav-brand { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; color: #2c3e50; }
         .nav-brand span { color: #c5a059; font-size: 22px; }
         
-        .nav-icons { display: flex; gap: 12px; }
-        .icon-btn { background: #f8f9fa; border: 1.5px solid #e9ecef; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.3s; text-decoration: none; color: #2c3e50; }
-        .icon-btn:hover { background: #c5a059; color: white; border-color: #c5a059; }
-
         .main-container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 20px; }
         
         .welcome-card { background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%); color: #ffffff; padding: 30px; border-radius: 18px; box-shadow: 0 10px 25px rgba(44, 62, 80, 0.15); text-align: right; }
@@ -78,7 +74,8 @@
     <div class="navbar">
         <div class="nav-brand">
             <span>✝</span> كنيسة الشهيد العظيم مارجرجس
-
+        </div>
+    </div>
 
     <div class="main-container">
         <div class="welcome-card">
@@ -92,7 +89,6 @@
 
             <div class="priest-actions-bar">
                 <button class="priest-action-btn" onclick="toggleRequestsSection()">📋 قائمة الطلبات الواردة</button>
-            
                 <a href="clock.html" class="priest-action-btn">📅 تنظيم الوقت والمواعيد (clock)</a>
             </div>
         </div>
@@ -154,7 +150,6 @@
             const totalCountElement = document.getElementById('totalCount');
 
             try {
-                // جلب كل المستندات من مجموعة check مباشرة بدون شروط معقدة لتجنب الأخطاء
                 const querySnapshot = await getDocs(collection(db, "check"));
 
                 if (querySnapshot.empty) {
@@ -183,11 +178,15 @@
                         const brideName = (data.bride && data.bride.fullName) ? data.bride.fullName : '';
                         const docStatus = data.documentsStatus || 'قيد المراجعة';
 
+                        // الاعتماد على الحقل الجديد المخصص للوقت appointmentTimeText بجانب الحقول القديمة كاحتياطي
+                        const timeVal = data.appointmentTimeText || data.time || data.bookingTime || '';
+                        const timeDisplay = timeVal ? ` | الساعة: <span style="color: #27ae60; font-weight: bold;">${timeVal}</span>` : '';
+
                         htmlContent += `
                             <div class="request-row-summary" id="row-${docId}">
                                 <div class="summary-info">
                                     <h4>${groomName} ${brideName ? '& ' + brideName : ''}</h4>
-                                    <p>رقم الطلب: ${docId} | الأوراق: <span style="color: #c5a059; font-weight: bold;">${docStatus}</span></p>
+                                    <p>رقم الطلب: ${docId} ${timeDisplay} | الأوراق: <span style="color: #c5a059; font-weight: bold;">${docStatus}</span></p>
                                 </div>
                                 <button class="link-details-btn" onclick="openRequestDetails('${docId}')">عرض تفاصيل الطلب 📋</button>
                             </div>
@@ -216,11 +215,12 @@
             const brideName = (data.bride && data.bride.fullName) ? data.bride.fullName : 'غير مسجل';
             const docStatus = data.documentsStatus || 'قيد المراجعة';
             const apptStatus = data.appointmentStatus || 'غير محدد';
-            const selectedDate = data.selectedAppointment || data.appointmentDate || 'لم يتم اختيار موعد';
+            const selectedDate = data.selectedAppointment || data.appointmentDate || data.date || 'لم يتم اختيار موعد';
+            
+            const timeVal = data.appointmentTimeText || data.time || data.bookingTime || '';
 
             const docActionInfo = data.documentsActionBy ? `<br><span style="color:#27ae60; font-size:11px;">بواسطة الأب: ${data.documentsActionBy} (${data.documentsActionTime || ''})</span>` : '';
             
-            // التعامل مع مسارات الصور سواء كانت idCardUrl أو غيرها
             const idCard = data.idCardUrl || data.idCard || data.cardImage || '';
             const certificate = data.certificateUrl || data.certificate || data.khلوImage || '';
 
@@ -228,6 +228,7 @@
                 <p style="margin-bottom: 8px;"><strong>رقم الطلب (ID):</strong> ${docId}</p>
                 <p style="margin-bottom: 8px;"><strong>العريس:</strong> ${groomName}</p>
                 <p style="margin-bottom: 8px;"><strong>العروسة:</strong> ${brideName}</p>
+                ${timeVal ? `<p style="margin-bottom: 8px;"><strong>ساعة الحجز:</strong> <span style="color: #27ae60; font-weight: bold;">${timeVal}</span></p>` : ''}
                 
                 <div style="margin-top: 10px;">
                     <p style="font-size: 13px;"><strong>حالة الأوراق:</strong> <span id="modal-doc-status-${docId}" style="color: #c5a059; font-weight: bold;">${docStatus}</span> ${docActionInfo}</p>

@@ -147,7 +147,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -177,17 +177,15 @@
 
         async function fetchUserData() {
             try {
+                // جلب البيانات من WeddingPackages للتحقق منها وعرضها
                 const docRef = doc(db, "WeddingPackages", packageId);
                 const snap = await getDoc(docRef);
                 
                 if (snap.exists()) {
                     retrievedData = snap.data();
                     
-                    // قراءة بيانات العريس من الـ map أو الحقول العادية
                     const groomName = retrievedData.groom?.fullName || retrievedData.fullName || "غير مسجل";
                     const groomPhone = retrievedData.groom?.phone || retrievedData.phone || "غير مسجل";
-                    
-                    // قراءة بيانات العروسة من الـ map بدقة حسب قاعدة البيانات لديك
                     const brideName = retrievedData.bride?.fullName || retrievedData.brideName || "غير مسجل";
                     const bridePhone = retrievedData.bride?.phone || retrievedData.bridePhone || "غير مسجل";
 
@@ -227,14 +225,15 @@
 
             try {
                 okBtn.disabled = true;
-                okBtn.textContent = "جاري فحص الموعد...";
+                okBtn.textContent = "جاري حفظ الموعد وإرساله للكاهن...";
 
-                const querySnapshot = await getDocs(collection(db, "WeddingPackages"));
+                // التحقق من تكرار الموعد في مجموعة check
+                const querySnapshot = await getDocs(collection(db, "check"));
                 let isTaken = false;
 
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    if (data.date === bookingDate && data.time === bookingTime && docSnap.id !== packageId) {
+                    if (data.date === bookingDate && data.appointmentTimeText === bookingTime && docSnap.id !== packageId) {
                         isTaken = true;
                     }
                 });
@@ -251,6 +250,16 @@
                 const brideName = retrievedData.bride?.fullName || retrievedData.brideName || "غير مسجل";
                 const bridePhone = retrievedData.bride?.phone || retrievedData.bridePhone || "غير مسجل";
 
+                // **حفظ البيانات مباشرة في مجموعة "check" التي يقرأ منها الكاهن**
+                const checkDocRef = doc(db, "check", packageId);
+                await setDoc(checkDocRef, {
+                    ...retrievedData,
+                    date: bookingDate,
+                    time: bookingTime,
+                    appointmentTimeText: bookingTime,
+                    bookingTime: bookingTime
+                }, { merge: true });
+
                 const whatsappNumber = "201203821961";
                 const message = `مرحباً، تفاصيل طلب حجز موعد جديد:
 - اسم العريس: ${groomName}
@@ -264,12 +273,15 @@
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
-                // الانتقال للواتساب مباشرة بدون أخطاء
-                window.location.href = whatsappUrl;
+                // فتح الواتساب والانتقال للصفحة الرئيسية home.html
+                window.open(whatsappUrl, '_blank');
+                
+                alert("تم تأكيد الحجز بنجاح وإرساله للوحة تحكم الكاهن.");
+                window.location.href = "home.html";
 
             } catch (error) {
                 console.error("خطأ:", error);
-                alert("حدث خطأ، يرجى المحاولة مرة أخرى.");
+                alert("حدث خطأ أثناء الاتصال بقاعدة البيانات. تأكد من الإنترنت.");
                 okBtn.disabled = false;
                 okBtn.textContent = "OK - تأكيد الحجز وإرسال للواتساب";
             }

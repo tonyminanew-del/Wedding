@@ -3,152 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حجز موعد الإكليل / الخطوبة</title>
+    <title>لوحة خدمات الكاهن</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
         body { 
             background: linear-gradient(135deg, #f4f6f9 0%, #e4e9f0 100%); 
             min-height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 15px; 
+            padding: 20px; 
             color: #2c3e50; 
         }
 
-        .booking-container { 
-            background: #ffffff; 
-            padding: 25px; 
-            border-radius: 24px; 
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); 
-            width: 100%; 
-            max-width: 480px; 
-            border-top: 5px solid #c5a059; 
-        }
-
-        .cross-symbol { 
-            font-size: 24px; 
-            color: #c5a059; 
-            background: #fdfcf7; 
-            width: 50px; 
-            height: 50px; 
-            line-height: 50px; 
-            border-radius: 50%; 
-            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2); 
-            text-align: center;
-            margin: 0 auto 15px auto;
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid #c5a059;
         }
 
         h2 {
             text-align: center;
-            font-size: 18px;
-            color: #2c3e50;
             margin-bottom: 20px;
+            color: #2c3e50;
         }
 
-        .form-group {
-            margin-bottom: 14px;
+        /* الأزرار الرئيسية الثلاثة */
+        .main-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        label {
-            display: block;
-            font-size: 13px;
+        .tab-btn {
+            background: #f1f5f9;
+            border: 1.5px solid #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
             color: #475569;
         }
 
-        input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 12px;
-            font-size: 13.5px;
-            outline: none;
-            transition: all 0.3s;
-            background: #f8fafc;
-        }
-
-        input:focus {
+        .tab-btn.active {
+            background: #c5a059;
+            color: white;
             border-color: #c5a059;
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
+            box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);
         }
 
-        .price-box {
-            background: #fdfcf7;
-            border: 1.5px dashed #c5a059;
-            padding: 12px;
+        /* الفلاتر الفرعية (المقبلولات / المرفوضات) */
+        .sub-filters {
+            display: none;
+            gap: 8px;
+            margin-bottom: 15px;
+            justify-content: center;
+            background: #f8fafc;
+            padding: 10px;
             border-radius: 12px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: #c5a059;
-            margin: 15px 0;
         }
 
-        .ok-btn { 
-            width: 100%;
-            background-color: #27ae60; 
-            color: white; 
-            border: none; 
-            padding: 12px; 
-            border-radius: 12px; 
-            font-size: 15px; 
-            font-weight: 600;
-            cursor: pointer; 
-            transition: all 0.2s; 
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.25);
-            text-align: center;
+        .sub-filter-btn {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            color: #64748b;
         }
+
+        .sub-filter-btn.active {
+            background: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+
+        /* فلاتر الوقت (الكل، اليوم، الشهر، السنة) */
+        .time-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            justify-content: center;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        /* صندوق عرض الحجوزات والطلبات */
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .item-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .item-info h4 {
+            font-size: 15px;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .item-info p {
+            font-size: 12.5px;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-accept {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-reject {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .status-badge {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .status-accepted { background: #e6f4ea; color: #137333; }
+        .status-rejected { background: #fce8e6; color: #c5221f; }
+        .status-pending { background: #fff8e1; color: #f57f17; }
         
-        .ok-btn:hover { 
-            background-color: #219653; 
-            transform: scale(1.02);
+        .no-data {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 40px;
+            font-size: 15px;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <div class="booking-container">
-        <div class="cross-symbol">✝</div>
-        <h2>بيانات حجز الموعد</h2>
 
-        <div class="form-group">
-            <label>اسم العريس:</label>
-            <input type="text" id="groomName" placeholder="أدخل اسم العريس ثلاثي">
+    <div class="container">
+        <h2>لوحة متابعة الحجوزات والطلبات</h2>
+
+        <div class="main-tabs">
+            <button class="tab-btn active" onclick="switchMainTab('new')">📅 الحجوزات الجديدة</button>
+            <button class="tab-btn" onclick="switchMainTab('pending')">⏳ الطلبات المعلقة</button>
+            <button class="tab-btn" onclick="switchMainTab('old')">📁 الحجوزات القديمة</button>
         </div>
 
-        <div class="form-group">
-            <label>رقم هاتف العريس:</label>
-            <input type="tel" id="groomPhone" placeholder="01xxxxxxxxx">
+        <div id="oldSubTabs" class="sub-filters" style="display: none;">
+            <button class="sub-filter-btn active" onclick="switchOldSubTab('accepted')">✅ المقبولات</button>
+            <button class="sub-filter-btn" onclick="switchOldSubTab('rejected')">❌ المرفوضات</button>
         </div>
 
-        <div class="form-group">
-            <label>اسم العروسة (الخطيبة):</label>
-            <input type="text" id="brideName" placeholder="أدخل اسم العروسة ثلاثي">
+        <div id="timeFilters" class="time-filters">
+            <button class="sub-filter-btn active" onclick="filterByTime('all')">الكل</button>
+            <button class="sub-filter-btn" onclick="filterByTime('today')">اليوم</button>
+            <button class="sub-filter-btn" onclick="filterByTime('month')">هذا الشهر</button>
+            <button class="sub-filter-btn" onclick="filterByTime('year')">هذه السنة</button>
         </div>
 
-        <div class="form-group">
-            <label>تاريخ الموعد:</label>
-            <input type="date" id="bookingDate">
+        <div class="items-list" id="itemsContainer">
+            <div class="no-data">جاري تحميل البيانات من قاعدة البيانات...</div>
         </div>
-
-        <div class="form-group">
-            <label>وقت الموعد (الساعة):</label>
-            <input type="time" id="bookingTime">
-        </div>
-
-        <div class="price-box">
-            رسوم الحجز الكلية: 500 جنيه مصري
-        </div>
-
-        <button class="ok-btn" id="okBtn">OK - تأكيد الحجز وإرسال للواتساب</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBJTnK89_MsJl7eMY99BdbRTHKtWinlK7g",
@@ -163,79 +222,155 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ضبط أقل تاريخ يمكن اختياره ليصبح هو تاريخ اليوم (لمنع اختيار أيام مضت)
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('bookingDate').min = todayStr;
+        let currentMainTab = 'new'; // 'new' | 'pending' | 'old'
+        let currentOldSub = 'accepted'; // 'accepted' | 'rejected'
+        let currentTimeFilter = 'all'; // 'all' | 'today' | 'month' | 'year'
+        let allPackagesData = [];
 
-        const okBtn = document.getElementById('okBtn');
+        window.switchMainTab = (tab) => {
+            currentMainTab = tab;
+            document.querySelectorAll('.main-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
 
-        okBtn.addEventListener('click', async () => {
-            const groomName = document.getElementById('groomName').value.trim();
-            const groomPhone = document.getElementById('groomPhone').value.trim();
-            const brideName = document.getElementById('brideName').value.trim();
-            const bookingDate = document.getElementById('bookingDate').value;
-            const bookingTime = document.getElementById('bookingTime').value;
+            document.getElementById('oldSubTabs').style.display = (tab === 'old') ? 'flex' : 'none';
+            renderData();
+        };
 
-            // التحقق من اكتمال البيانات
-            if (!groomName || !groomPhone || !brideName || !bookingDate || !bookingTime) {
-                alert("يرجى ملء جميع البيانات بشكل صحيح.");
+        window.switchOldSubTab = (sub) => {
+            currentOldSub = sub;
+            document.querySelectorAll('#oldSubTabs .sub-filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderData();
+        };
+
+        window.filterByTime = (time) => {
+            currentTimeFilter = time;
+            document.querySelectorAll('#timeFilters .sub-filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderData();
+        };
+
+        async function fetchData() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "WeddingPackages"));
+                allPackagesData = [];
+                querySnapshot.forEach((docSnap) => {
+                    allPackagesData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderData();
+            } catch (err) {
+                console.error("خطأ في جلب البيانات:", err);
+                document.getElementById('itemsContainer').innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء جلب البيانات.</div>`;
+            }
+        }
+
+        window.updateStatus = async (packageId, newStatus) => {
+            try {
+                await updateDoc(doc(db, "WeddingPackages", packageId), { status: newStatus });
+                alert("تم تحديث حالة الطلب بنجاح!");
+                fetchData();
+            } catch (error) {
+                console.error("فشل التحديث:", error);
+                alert("حدث خطأ أثناء التحديث.");
+            }
+        };
+
+        function renderData() {
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = "";
+
+            if (allPackagesData.length === 0) {
+                container.innerHTML = `<div class="no-data">لا توجد بيانات في قاعدة البيانات</div>`;
                 return;
             }
 
-            // التحقق من أن التاريخ ليس في الماضي
-            const selectedDateTime = new Date(`${bookingDate}T${bookingTime}`);
             const now = new Date();
 
-            if (selectedDateTime < now) {
-                alert("عذراً، لا يمكن اختيار تاريخ أو وقت قديم/منقضٍ.");
+            const filtered = allPackagesData.filter(item => {
+                let itemDate = now;
+                if (item.createdAt && typeof item.createdAt.toDate === 'function') {
+                    itemDate = item.createdAt.toDate();
+                } else if (item.lastTimestamp && typeof item.lastTimestamp.toDate === 'function') {
+                    itemDate = item.lastTimestamp.toDate();
+                }
+
+                const status = item.status || 'pending'; 
+                let isExpired = (now - itemDate) > (24 * 60 * 60 * 1000); 
+
+                if (currentMainTab === 'new') {
+                    return !isExpired && status !== 'rejected';
+                } else if (currentMainTab === 'pending') {
+                    return status === 'pending';
+                } else if (currentMainTab === 'old') {
+                    const effectiveStatus = (isExpired && status === 'pending') ? 'accepted' : status;
+                    if (effectiveStatus !== currentOldSub) return false;
+
+                    if (currentTimeFilter === 'today') {
+                        return itemDate.toDateString() === now.toDateString();
+                    } else if (currentTimeFilter === 'month') {
+                        return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+                    } else if (currentTimeFilter === 'year') {
+                        return itemDate.getFullYear() === now.getFullYear();
+                    }
+                    return true;
+                }
+                return false;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="no-data">لا توجد بيانات</div>`;
                 return;
             }
 
-            // التحقق في قاعدة البيانات عما إذا كان هذا الموعد محجوزاً مسبقاً من شخص آخر
-            try {
-                okBtn.disabled = true;
-                okBtn.textContent = "جاري التحقق من الموعد...";
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'item-card';
 
-                const querySnapshot = await getDocs(collection(db, "WeddingPackages"));
-                let isAlreadyTaken = false;
-
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    // إذا وجدنا حجزاً بنفس التاريخ والوقت المدخل
-                    if (data.date === bookingDate && data.time === bookingTime) {
-                        isAlreadyTaken = true;
-                    }
-                });
-
-                if (isAlreadyTaken) {
-                    alert("عذراً، هذا الموعد (التاريخ والساعة) محجوز بالفعل لشخص آخر. يرجى اختيار موعد آخر.");
-                    okBtn.disabled = false;
-                    okBtn.textContent = "OK - تأكيد الحجز وإرسال للواتساب";
-                    return;
+                const name = item.fullName || item.groom?.fullName || item.id;
+                const phone = item.phone || item.groom?.phone || "غير متوفر";
+                
+                let dateStr = "غير محدد";
+                if (item.createdAt && typeof item.createdAt.toDate === 'function') {
+                    dateStr = item.createdAt.toDate().toLocaleString('ar-EG');
                 }
 
-                // إذا كان الموعد متاحاً، يتم تجهيز رسالة الواتساب وتوجيه المستخدم
-                const whatsappNumber = "201203821961";
-                const message = `مرحباً، أرغب في تأكيد حجز موعد جديد بالدقة التالية:
-- اسم العريس: ${groomName}
-- رقم هاتف العريس: ${groomPhone}
-- اسم العروسة (الخطيبة): ${brideName}
-- تاريخ الموعد: ${bookingDate}
-- وقت الموعد: ${bookingTime}
-- رسوم الحجز: 500 جنيه`;
+                let actionHtml = '';
+                const currentStatus = item.status || 'pending';
 
-                const encodedMessage = encodeURIComponent(message);
-                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+                if (currentMainTab === 'pending') {
+                    actionHtml = `
+                        <div class="action-btns">
+                            <button class="btn-accept" onclick="updateStatus('${item.id}', 'accepted')">قبول</button>
+                            <button class="btn-reject" onclick="updateStatus('${item.id}', 'rejected')">رفض</button>
+                        </div>
+                    `;
+                } else {
+                    let badgeClass = 'status-accepted';
+                    let badgeText = 'مقبول';
+                    if (currentStatus === 'rejected') {
+                        badgeClass = 'status-rejected';
+                        badgeText = 'مرفوض';
+                    } else if (currentStatus === 'pending') {
+                        badgeClass = 'status-pending';
+                        badgeText = 'معلق';
+                    }
+                    actionHtml = `<span class="status-badge ${badgeClass}">${badgeText}</span>`;
+                }
 
-                window.location.href = whatsappUrl;
+                div.innerHTML = `
+                    <div class="item-info">
+                        <h4>الاسم: ${name}</h4>
+                        <p>رقم الهاتـف: ${phone}</p>
+                        <p>التوقيـت: ${dateStr}</p>
+                        <p style="font-size: 11px; color: #94a3b8;">رقم الوثيقة: ${item.id}</p>
+                    </div>
+                    ${actionHtml}
+                `;
+                container.appendChild(div);
+            });
+        }
 
-            } catch (error) {
-                console.error("خطأ في التحقق من الحجوزات:", error);
-                alert("حدث خطأ أثناء التحقق من الموعد، يرجى المحاولة مرة أخرى.");
-                okBtn.disabled = false;
-                okBtn.textContent = "OK - تأكيد الحجز وإرسال للواتساب";
-            }
-        });
+        fetchData();
     </script>
 </body>
 </html>

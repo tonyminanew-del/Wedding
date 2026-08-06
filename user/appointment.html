@@ -163,10 +163,7 @@
         const db = getFirestore(app);
 
         const packageId = localStorage.getItem('userId');
-        if (!packageId) {
-            alert("يرجى تسجيل الدخول أولاً.");
-            window.location.href = "home.html";
-        }
+        
 
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('bookingDate').min = todayStr;

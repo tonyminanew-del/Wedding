@@ -124,13 +124,13 @@
         .item-info h4 {
             font-size: 15px;
             color: #2c3e50;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .item-info p {
             font-size: 12.5px;
             color: #64748b;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .action-btns {
@@ -180,7 +180,7 @@
 <body>
 
     <div class="container">
-        <h2>لوحة متابعة الحجوزات والطلبات</h2>
+        <h2>لوحة متابعة الحجوزات والطلبات (الكاهن)</h2>
 
         <div class="main-tabs">
             <button class="tab-btn active" onclick="switchMainTab('new')">📅 الحجوزات الجديدة</button>
@@ -252,7 +252,8 @@
 
         async function fetchData() {
             try {
-                const querySnapshot = await getDocs(collection(db, "WeddingPackages"));
+                // سحب البيانات من مجموعة "check" حيث يتم حفظ حجز العروسين
+                const querySnapshot = await getDocs(collection(db, "check"));
                 allPackagesData = [];
                 querySnapshot.forEach((docSnap) => {
                     allPackagesData.push({ id: docSnap.id, ...docSnap.data() });
@@ -260,13 +261,16 @@
                 renderData();
             } catch (err) {
                 console.error("خطأ في جلب البيانات:", err);
-                document.getElementById('itemsContainer').innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء جلب البيانات.</div>`;
+                document.getElementById('itemsContainer').innerHTML = `<div class="no-data" style="color: #e74c3c;">حدث خطأ أثناء جلب البيانات. تأكد من الإنترنت.</div>`;
             }
         }
 
         window.updateStatus = async (packageId, newStatus) => {
             try {
-                await updateDoc(doc(db, "WeddingPackages", packageId), { status: newStatus });
+                await updateDoc(doc(db, "check", packageId), { 
+                    status: newStatus,
+                    documentsStatus: newStatus === 'accepted' ? 'مقبولة' : 'مرفوضة'
+                });
                 alert("تم تحديث حالة الطلب بنجاح!");
                 fetchData();
             } catch (error) {
@@ -280,7 +284,7 @@
             container.innerHTML = "";
 
             if (allPackagesData.length === 0) {
-                container.innerHTML = `<div class="no-data">لا توجد بيانات في قاعدة البيانات</div>`;
+                container.innerHTML = `<div class="no-data">لا توجد بيانات مسجلة حالياً</div>`;
                 return;
             }
 
@@ -288,22 +292,20 @@
 
             const filtered = allPackagesData.filter(item => {
                 let itemDate = now;
-                if (item.createdAt && typeof item.createdAt.toDate === 'function') {
+                if (item.date) {
+                    itemDate = new Date(item.date);
+                } else if (item.createdAt && typeof item.createdAt.toDate === 'function') {
                     itemDate = item.createdAt.toDate();
-                } else if (item.lastTimestamp && typeof item.lastTimestamp.toDate === 'function') {
-                    itemDate = item.lastTimestamp.toDate();
                 }
 
                 const status = item.status || 'pending'; 
-                let isExpired = (now - itemDate) > (24 * 60 * 60 * 1000); 
 
                 if (currentMainTab === 'new') {
-                    return !isExpired && status !== 'rejected';
+                    return status !== 'rejected';
                 } else if (currentMainTab === 'pending') {
                     return status === 'pending';
                 } else if (currentMainTab === 'old') {
-                    const effectiveStatus = (isExpired && status === 'pending') ? 'accepted' : status;
-                    if (effectiveStatus !== currentOldSub) return false;
+                    if (status !== currentOldSub) return false;
 
                     if (currentTimeFilter === 'today') {
                         return itemDate.toDateString() === now.toDateString();
@@ -318,7 +320,7 @@
             });
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="no-data">لا توجد بيانات</div>`;
+                container.innerHTML = `<div class="no-data">لا توجد بيانات مطابقة لهذا التصنيف</div>`;
                 return;
             }
 
@@ -326,13 +328,13 @@
                 const div = document.createElement('div');
                 div.className = 'item-card';
 
-                const name = item.fullName || item.groom?.fullName || item.id;
-                const phone = item.phone || item.groom?.phone || "غير متوفر";
+                const groomName = item.groom?.fullName || item.fullName || "غير مسجل";
+                const groomPhone = item.groom?.phone || item.phone || "غير مسجل";
+                const brideName = item.bride?.fullName || item.brideName || "غير مسجل";
+                const bridePhone = item.bride?.phone || item.bridePhone || "غير مسجل";
                 
-                let dateStr = "غير محدد";
-                if (item.createdAt && typeof item.createdAt.toDate === 'function') {
-                    dateStr = item.createdAt.toDate().toLocaleString('ar-EG');
-                }
+                const apptDate = item.date || item.selectedAppointment || "لم يُحدد بعد";
+                const apptTime = item.appointmentTimeText || item.time || item.bookingTime || "لم يُحدد بعد";
 
                 let actionHtml = '';
                 const currentStatus = item.status || 'pending';
@@ -359,10 +361,10 @@
 
                 div.innerHTML = `
                     <div class="item-info">
-                        <h4>الاسم: ${name}</h4>
-                        <p>رقم الهاتـف: ${phone}</p>
-                        <p>التوقيـت: ${dateStr}</p>
-                        <p style="font-size: 11px; color: #94a3b8;">رقم الوثيقة: ${item.id}</p>
+                        <h4>🤵 العريس: ${groomName} (${groomPhone})</h4>
+                        <h4>👰 العروسة: ${brideName} (${bridePhone})</h4>
+                        <p>📅 تاريخ الموعد: <b>${apptDate}</b> | ⏰ الوقت: <b>${apptTime}</b></p>
+                        <p style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;">رقم الطلب (ID): ${item.id}</p>
                     </div>
                     ${actionHtml}
                 `;

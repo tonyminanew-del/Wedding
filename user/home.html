@@ -18,6 +18,7 @@
         .appointment-btn { background-color: #27ae60 !important; display: none; margin-top: 10px; }
         .appointment-btn:hover { background-color: #219653 !important; }
         .status-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #eef2f7; color: #2980b9; }
+        .appointment-info-box { background: #f0fdf4; border: 1.5px dashed #27ae60; padding: 12px; border-radius: 10px; margin-top: 15px; display: none; font-size: 13.5px; line-height: 1.6; color: #166534; }
     </style>
 </head>
 <body>
@@ -36,9 +37,15 @@
             <p><strong>حالة المستندات:</strong> <span class="status-badge" id="displayDocStatus">غير متوفر</span></p>
         </div>
 
+        <div class="appointment-info-box" id="appointmentInfoBox">
+            <p><strong>📅 تاريخ الموعد المحجوز:</strong> <span id="displayApptDate">-</span></p>
+            <p><strong>⏰ ساعة الحجز:</strong> <span id="displayApptTime">-</span></p>
+            <p><strong>📌 حالة الموعد:</strong> <span id="displayApptStatus">قيد المتابعة</span></p>
+        </div>
+
         <a href="documents.html" class="action-btn">رفع أو تعديل المستندات 📄</a>
         
-        <a href="clock.html" class="action-btn appointment-btn" id="appointmentBtn">📅 اضغط هنا لاختيار موعد الإكليل (تم قبول الأوراق)</a>
+        <a href="clock.html" class="action-btn appointment-btn" id="appointmentBtn">📅 اضغط هنا لتحديد/تعديل موعد الإكليل (تم قبول الأوراق)</a>
     </div>
 
     <script type="module">
@@ -61,6 +68,7 @@
         window.addEventListener('DOMContentLoaded', async () => {
             const statusBadge = document.getElementById('displayDocStatus');
             const appointmentBtn = document.getElementById('appointmentBtn');
+            const appointmentInfoBox = document.getElementById('appointmentInfoBox');
 
             const currentUserId = localStorage.getItem('userId');
 
@@ -71,7 +79,7 @@
             }
 
             try {
-                // التعديل هنا: البحث في مجموعة "check" ليتطابق مع لوحة تحكم أب الكاهن
+                // البحث في مجموعة "check" ليتطابق مع لوحة تحكم أب الكاهن
                 const docRef = doc(db, "check", currentUserId);
                 const docSnap = await getDoc(docRef);
 
@@ -89,6 +97,18 @@
                 document.getElementById('displayGroomPhone').innerText = (data.groom && data.groom.phone) ? data.groom.phone : 'لا توجد بيانات';
                 document.getElementById('displayBridePhone').innerText = (data.bride && data.bride.phone) ? data.bride.phone : 'لا توجد بيانات';
 
+                // فحص وعرض بيانات الموعد إذا تم حجزها مسبقاً
+                const apptDate = data.date || data.selectedAppointment || data.appointmentDate || '';
+                const apptTime = data.appointmentTimeText || data.time || data.bookingTime || '';
+                const apptStatus = data.appointmentStatus || 'قيد المتابعة من الكاهن';
+
+                if (apptDate || apptTime) {
+                    document.getElementById('displayApptDate').innerText = apptDate || 'لم يُحدد بعد';
+                    document.getElementById('displayApptTime').innerText = apptTime || 'لم يُحدد بعد';
+                    document.getElementById('displayApptStatus').innerText = apptStatus;
+                    appointmentInfoBox.style.display = 'block'; // إظهار صندوق الموعد
+                }
+
                 const rawStatus = data.documentsStatus || data.status || 'قيد المراجعة';
                 const cleanStatus = String(rawStatus).trim().toLowerCase();
 
@@ -105,7 +125,7 @@
                     statusBadge.innerText = 'مقبولة ✅';
                     statusBadge.style.backgroundColor = '#d4edda';
                     statusBadge.style.color = '#155724';
-                    appointmentBtn.style.display = 'block'; // ظهور زر الموعد فوراً
+                    appointmentBtn.style.display = 'block'; // ظهور زر اختيار الموعد فوراً
                 } else {
                     statusBadge.innerText = rawStatus;
                     statusBadge.style.backgroundColor = '#f8d7da';
